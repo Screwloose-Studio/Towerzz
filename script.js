@@ -91,8 +91,8 @@ const towers = [
     },
     { 
         name: "Pesticide", 
-        fireRate: 1, 
-        damage: 4, 
+        fireRate: 0.5, 
+        damage: 8, 
         range: 3, 
         cost: 200, 
         color: 'limegreen', 
@@ -102,7 +102,7 @@ const towers = [
         maxHP: 40,
         upgradeLevel: 0,
         upgrades: [
-            { fireRate: 0.5, damage: 10, range: 3 },
+            { fireRate: 0.5, damage: 8, range: 3 },
             { fireRate: 0.5, damage: 10, range: 4 }, // Level 1 upgrade
             { fireRate: 0.8, damage: 10, range: 4 }  // Level 2 upgrade
         ]
@@ -156,7 +156,7 @@ const towers = [
         maxHP: 40,
         upgradeLevel: 0,
         upgrades: [
-            { fireRate: 0.4, damage: 2, range: 2 },
+            { fireRate: 0.4, damage: 2, range: 3 },
             { fireRate: 0.6, damage: 4, range: 2 }, // Level 1 upgrade
             { fireRate: 0.4, damage: 7, range: 3 }    // Level 2 upgrade
         ]
@@ -199,9 +199,9 @@ const towers = [
     },
     { 
         name: "Terra", 
-        fireRate: 0.2, 
+        fireRate: 0.3, 
         damage: 4, 
-        range: 3, 
+        range: 2, 
         cost: 250, 
         color: 'sienna', 
         id: 9, 
@@ -219,7 +219,7 @@ const towers = [
         name: "Thunder", 
         fireRate: 0.5, 
         damage: 3, 
-        range: 2, 
+        range: 3, 
         cost: 250, 
         color: 'yellowgreen', 
         id: 10, 
@@ -395,7 +395,7 @@ const enemies = [
     { name: "Rocky", speed: 1, hp: 300, value: 30, color: 'sienna', element: 'Earth' },
     { name: "Sparky", speed: 1.1, hp: 250, value: 30, color: 'yellowgreen', element: 'Electric' },
     { name: "Wraith", speed: 1.4, hp: 150, value: 30, color: 'black', element: 'Ghost', wings: true, bodySize: tileSize / 4 },
-    { name: "Buggy", speed: 0.9, hp: 150, value: 30, color: 'orange', element: 'Bug', bodySize: tileSize / 3 }
+    { name: "Buggy", speed: 0.9, hp: 200, value: 30, color: 'orange', element: 'Bug', bodySize: tileSize / 3 }
 ];
 // End of enemy definitions
 
