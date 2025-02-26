@@ -1,0 +1,122 @@
+[
+  {
+    "wave": 1,
+    "enemies": [
+      {
+        "type": 0,
+        "count": 10
+      }
+    ],
+    "hpMultiplier": 1,
+    "speedMultiplier": 1,
+    "wave_delay": 4000
+  },
+  {
+    "wave": 2,
+    "enemies": [
+      {
+        "type": 0,
+        "count": 10
+      }
+    ],
+    "hpMultiplier": 1,
+    "speedMultiplier": 1,
+    "wave_delay": 4000
+  },
+  {
+    "wave": 3,
+    "enemies": [
+      {
+        "type": 0,
+        "count": 10
+      }
+    ],
+    "hpMultiplier": 1,
+    "speedMultiplier": 1,
+    "wave_delay": 4000
+  },
+  {
+    "wave": 4,
+    "enemies": [
+      {
+        "type": 0,
+        "count": 10
+      }
+    ],
+    "hpMultiplier": 1,
+    "speedMultiplier": 1,
+    "wave_delay": 4000
+  },
+  {
+    "wave": 5,
+    "enemies": [
+      {
+        "type": 0,
+        "count": 10
+      }
+    ],
+    "hpMultiplier": 1,
+    "speedMultiplier": 1,
+    "wave_delay": 4000
+  },
+  {
+    "wave": 6,
+    "enemies": [
+      {
+        "type": 0,
+        "count": 10
+      }
+    ],
+    "hpMultiplier": 1,
+    "speedMultiplier": 1,
+    "wave_delay": 4000
+  },
+  {
+    "wave": 7,
+    "enemies": [
+      {
+        "type": 0,
+        "count": 10
+      }
+    ],
+    "hpMultiplier": 1,
+    "speedMultiplier": 1,
+    "wave_delay": 4000
+  },
+  {
+    "wave": 8,
+    "enemies": [
+      {
+        "type": 0,
+        "count": 10
+      }
+    ],
+    "hpMultiplier": 1,
+    "speedMultiplier": 1,
+    "wave_delay": 4000
+  },
+  {
+    "wave": 9,
+    "enemies": [
+      {
+        "type": 0,
+        "count": 10
+      }
+    ],
+    "hpMultiplier": 1,
+    "speedMultiplier": 1,
+    "wave_delay": 4000
+  },
+  {
+    "wave": 10,
+    "enemies": [
+      {
+        "type": 0,
+        "count": 10
+      }
+    ],
+    "hpMultiplier": 1,
+    "speedMultiplier": 1,
+    "wave_delay": 4000
+   }
+]

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tower Defense Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="gameWrapper">
+        <div id="gameContainer">
+            <div id="leftPanel">
+                <div id="towerWindow">
+                    <h3>Towerzz</h3>
+                    <div id="towerButtons"></div>  
+                    <div id="towerStats" class="stats">
+                        <strong>Select a tower to view stats</strong>
+                    </div>
+                </div>
+            </div>
+            <div id="gameDisplay">
+                <div class="hud" id="hud">
+                    Lives: <span id="lives">20</span> | Gold: <span id="gold">2000</span> | Wave: <span id="wave">0</span> / <span id="totalWaves">99</span> | Score: <span id="score">0</span> | <span id="gameState">Playing</span> | Difficulty: <span id="difficultyDisplay"></span>
+                </div>
+                <div id="effectLayer">
+                    <canvas id="gameCanvas"></canvas>
+                </div>
+            </div>
+            <div id="rightPanel">
+                <div id="enemyWindow">
+                    <h3>Enemies</h3>
+                    <div id="enemyButtons"></div>  
+                    <div id="enemyStats" class="stats">
+                        <strong>Select an enemy to view stats</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Countdown timer moved here -->
+        <div id="waveDelayTimerRow" class="timer-row">
+            <span id="waveDelayTimer"></span>
+        </div>
+        <div id="gameControls">
+            <button id="startGameBtn" class="start-button">Start Game</button>
+            <button id="pauseGameBtn" class="pause-button">Pause Game</button>
+            <button id="resetGameBtn" class="reset-button">Reset Game</button>
+            <button id="devModeToggle" class="dev-button">Dev Mode: OFF</button>
+            <button id="spawnToggle" class="spawn-button">Spawn Mode: OFF</button>
+            <button id="skipWaveDelay" class="skip-button">Send Next Wave</button>
+        </div>
+    </div>
+    <div id="startMenu" style="display: none;">
+        <h2>Tower Defense</h2>
+        <button id="playButton">Play</button>
+    </div>
+    <script src="howler.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
