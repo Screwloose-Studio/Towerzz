@@ -363,12 +363,12 @@ function playTowerShootSound(tower) {
         activeTowerSounds.add(towerType);
         const soundId = towerSounds[towerType].play();
         towerSoundCooldowns.set(towerType, currentTime);
-        console.log(`Playing sound for ${towerType} at ${currentTime}`);
+        // console.log(`Playing sound for ${towerType} at ${currentTime}`);
 
         // Remove from active set when sound finishes
         towerSounds[towerType].once('end', () => {
             activeTowerSounds.delete(towerType);
-            console.log(`Sound ended for ${towerType}`);
+            // console.log(`Sound ended for ${towerType}`);
         }, soundId);
     }
 }
@@ -458,11 +458,11 @@ async function loadWaves(difficulty) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             waves = await response.json();
-            console.log(`Waves loaded successfully for ${difficulty} difficulty.`);
+            // console.log(`Waves loaded successfully for ${difficulty} difficulty.`);
             return; // Exit on success
         } catch (error) {
             attempts++;
-            console.error(`Attempt ${attempts} failed to load wave data:`, error);
+            // console.error(`Attempt ${attempts} failed to load wave data:`, error);
             if (attempts === maxRetries) {
                 console.log("Max retries reached. Using fallback wave data.");
                 waves = [
@@ -678,7 +678,9 @@ function spawnHoleFromWave(holeData, entryPoint = null) {
         if (!holes) holes = [];
         holes.push(newHole);
         alarmSound.play();
-        console.log("Alarm sound played for hole spawn at", position.x, position.y, "with data:", holeData);
+        console.log("Hole spawned at position:", position.x, position.y, "with data:", holeData);
+    } else {
+        console.error("Failed to find a valid position for hole spawn in wave", currentWave, "with data:", holeData);
     }
 }
 // End of Spawn Enemies for Waves
@@ -1099,7 +1101,7 @@ class Bullet {
                     const oldHP = enemy.hp;
                     
                     enemy.hp -= damageDealt;
-                    console.log(`${this.tower.name} hit ${enemy.name} - HP reduced from ${oldHP} to ${enemy.hp}, Damage: ${damageDealt}`);
+                    // console.log(`${this.tower.name} hit ${enemy.name} - HP reduced from ${oldHP} to ${enemy.hp}, Damage: ${damageDealt}`);
                     
                     this.tower.damageDealt = damageDealt;
                     this.damageApplied = true;
@@ -1208,7 +1210,7 @@ class Rocket {
     });
 
     if (enemiesHit.length > 0) {
-        console.log(`${this.tower.name} Explosion Total Damage: ${this.damageDealt}`);
+        // console.log(`${this.tower.name} Explosion Total Damage: ${this.damageDealt}`);
     }
     this.tower.damageDealt += this.damageDealt;
 }
@@ -1307,7 +1309,7 @@ class LightBullet {
             if (distance < (wraith.bodySize || 20) + this.radius) {
                 const oldHP = wraith.hp;
                 wraith.hp -= this.damage;
-                console.log(`Wraith ${wraith.name} HP reduced from ${oldHP} to ${wraith.hp}, Damage: ${oldHP - wraith.hp}`);
+                // console.log(`Wraith ${wraith.name} HP reduced from ${oldHP} to ${wraith.hp}, Damage: ${oldHP - wraith.hp}`);
                 if (typeof this.tower.damageDealt !== 'number') {
                     this.tower.damageDealt = 0;
                 }
@@ -1629,14 +1631,14 @@ function updateTowers(deltaTime) {
                         case "Flame":
                             const oldHPFlame = enemy.hp;
                             enemy.hp -= actualDamage;
-                            console.log(`${tower.name} hit ${enemy.name} - HP reduced from ${oldHPFlame} to ${enemy.hp}, Damage: ${actualDamage}`);
+                            // console.log(`${tower.name} hit ${enemy.name} - HP reduced from ${oldHPFlame} to ${enemy.hp}, Damage: ${actualDamage}`);
                             tower.damageDealt += actualDamage;
                             break;
                         case "Freeze":
                             enemy.speedMultiplier = 0.5;
                             const oldHPFreeze = enemy.hp;
                             enemy.hp -= actualDamage;
-                            console.log(`${tower.name} applied freeze effect to ${enemy.name} - HP reduced from ${oldHPFreeze} to ${enemy.hp}, Damage: ${actualDamage}`);
+                            // console.log(`${tower.name} applied freeze effect to ${enemy.name} - HP reduced from ${oldHPFreeze} to ${enemy.hp}, Damage: ${actualDamage}`);
                             tower.damageDealt += actualDamage;
                             break;
                         case "Aqua":
@@ -1654,7 +1656,7 @@ function updateTowers(deltaTime) {
                                 const damageDealt = tower.damage * damageMultiplier;
                                 const oldHPAqua = nearestEnemyAqua.hp;
                                 nearestEnemyAqua.hp -= damageDealt;
-                                console.log(`${tower.name} hit ${nearestEnemyAqua.name} - HP reduced from ${oldHPAqua} to ${nearestEnemyAqua.hp}, Damage: ${damageDealt}`);
+                                // console.log(`${tower.name} hit ${nearestEnemyAqua.name} - HP reduced from ${oldHPAqua} to ${nearestEnemyAqua.hp}, Damage: ${damageDealt}`);
                                 tower.damageDealt += damageDealt;
                                 createAquaStreamEffect(tower, nearestEnemyAqua);
                             }
@@ -1675,7 +1677,7 @@ function updateTowers(deltaTime) {
                                 const damageDealt = tower.damage * damageMultiplier;
                                 const oldHPGale = nearestEnemyGale.hp;
                                 nearestEnemyGale.hp -= damageDealt;
-                                console.log(`${tower.name} hit ${nearestEnemyGale.name} - HP reduced from ${oldHPGale} to ${nearestEnemyGale.hp}, Damage: ${damageDealt}`);
+                                // console.log(`${tower.name} hit ${nearestEnemyGale.name} - HP reduced from ${oldHPGale} to ${nearestEnemyGale.hp}, Damage: ${damageDealt}`);
                                 tower.damageDealt += damageDealt;
                                 createWindBladeEffect(tower, nearestEnemyGale);
                             }
@@ -1688,10 +1690,10 @@ function updateTowers(deltaTime) {
                                 const damageDealt = tower.damage * damageMultiplier;
                                 const oldHPTerra = enemy.hp;
                                 enemy.hp -= damageDealt;
-                                console.log(`${tower.name} hit ${enemy.name} - HP reduced from ${oldHPTerra} to ${enemy.hp}, Damage: ${damageDealt}`);
+                                // console.log(`${tower.name} hit ${enemy.name} - HP reduced from ${oldHPTerra} to ${enemy.hp}, Damage: ${damageDealt}`);
                                 totalDamageTerra += damageDealt;
                             });
-                            console.log(`${tower.name} Total Damage from Earthquake: ${totalDamageTerra}`);
+                            // console.log(`${tower.name} Total Damage from Earthquake: ${totalDamageTerra}`);
                             tower.damageDealt += totalDamageTerra;
                             drawEarthquakeEffect(tower);
                             break;
@@ -1710,7 +1712,7 @@ function updateTowers(deltaTime) {
                                 const damageDealt = tower.damage * damageMultiplier;
                                 const oldHPThunder = nearestEnemyThunder.hp;
                                 nearestEnemyThunder.hp -= damageDealt;
-                                console.log(`${tower.name} hit ${nearestEnemyThunder.name} - HP reduced from ${oldHPThunder} to ${nearestEnemyThunder.hp}, Damage: ${damageDealt}`);
+                                // console.log(`${tower.name} hit ${nearestEnemyThunder.name} - HP reduced from ${oldHPThunder} to ${nearestEnemyThunder.hp}, Damage: ${damageDealt}`);
                                 tower.damageDealt += damageDealt;
                                 createLightningEffect(tower, nearestEnemyThunder);
                             }
@@ -1724,7 +1726,7 @@ function updateTowers(deltaTime) {
                             enemiesInRange.forEach(buggy => {
                                 const oldHPPesticide = buggy.hp;
                                 buggy.hp -= actualDamage;
-                                console.log(`${tower.name} hit ${buggy.name} - HP reduced from ${oldHPPesticide} to ${buggy.hp}, Damage: ${actualDamage}`);
+                                // console.log(`${tower.name} hit ${buggy.name} - HP reduced from ${oldHPPesticide} to ${buggy.hp}, Damage: ${actualDamage}`);
                                 tower.damageDealt += actualDamage;
                                 createPesticideEffect(tower, buggy);
                             });
@@ -1743,14 +1745,14 @@ function updateTowers(deltaTime) {
                             if (nearestEnemy) {
                                 if (tower.name === "Pellet" || tower.name === "Gatling" || tower.name === "Sniper") {
                                     createBullet(tower, nearestEnemy);
-                                    console.log(`Before ${tower.name} damage update: ${tower.damageDealt}`);
+                                    // console.log(`Before ${tower.name} damage update: ${tower.damageDealt}`);
                                     tower.damageDealt += tower.damage * damageMultiplier;
-                                    console.log(`After ${tower.name} damage update: ${tower.damageDealt}`);
+                                    // console.log(`After ${tower.name} damage update: ${tower.damageDealt}`);
                                 } else if (tower.name === "Rocket") {
                                     createRocket(tower, nearestEnemy);
-                                    console.log(`Before ${tower.name} damage update: ${tower.damageDealt}`);
+                                    // console.log(`Before ${tower.name} damage update: ${tower.damageDealt}`);
                                     tower.damageDealt += tower.damage * damageMultiplier;
-                                    console.log(`After ${tower.name} damage update: ${tower.damageDealt}`);
+                                    // console.log(`After ${tower.name} damage update: ${tower.damageDealt}`);
                                 }
                             }
                     }
@@ -1771,7 +1773,7 @@ function updateTowers(deltaTime) {
                         if (tower.name === "Terra") {
                             enemy.stunned = false;
                         }
-                        console.log(`${enemy.name} speed reset to normal`);
+                        // console.log(`${enemy.name} speed reset to normal`);
                     }
                 });
 
@@ -1859,7 +1861,7 @@ function buggyAttackTower(buggy, tower) {
             if (currentTime - lastChewTime >= chewCooldown && !window.gamePaused) {
                 chewSound.play();
                 towerSoundCooldowns.set('chew', currentTime);
-                console.log(`Playing chew sound at ${currentTime}`);
+                // console.log(`Playing chew sound at ${currentTime}`);
             }
 
             if (tower.hp <= 0) {
@@ -1912,7 +1914,7 @@ function killEnemy(enemy, array) {
             if (currentTime - lastFartTime >= fartCooldown && !window.gamePaused) {
                 fartSound.play();
                 towerSoundCooldowns.set('fart', currentTime);
-                console.log(`Fart sound played for ${enemy.name} killed at ${currentTime}`);
+                // console.log(`Fart sound played for ${enemy.name} killed at ${currentTime}`);
             }
         }
 
@@ -2907,10 +2909,10 @@ function moveEnemies(deltaTime) {
                 lives--;
                 if (!window.gamePaused) {
                     yaySound.play(); // Play yay sound when enemy escapes
-                    console.log(`Yay sound played for ${enemy.name} escaping through gate`);
+                    // console.log(`Yay sound played for ${enemy.name} escaping through gate`);
                 }
                 updateHUD();
-                console.log('Enemy reached exit, lives decreased');
+                // console.log('Enemy reached exit, lives decreased');
                 if (lives <= 0 && gameStarted) { // Only trigger if game is still running
                     showGameOver();
                 }
@@ -3030,7 +3032,7 @@ function moveWraiths() {
             lives--;
             if (!window.gamePaused) {
                 yaySound.play(); // Play yay sound when wraith escapes
-                console.log(`Yay sound played for ${wraith.name} escaping through gate`);
+                // console.log(`Yay sound played for ${wraith.name} escaping through gate`);
             }
             updateHUD();
             // console.log('Wraith reached exit, lives decreased');
@@ -3058,7 +3060,7 @@ async function startGame() {
         enemiesOnField = []; 
         wraithsOnField = []; 
         if (waves.length > 0) {
-            console.log("Spawning first wave");
+            // console.log("Spawning first wave");
             spawnEnemiesForWave();
         } else {
             console.error("No wave data available. Please ensure waves are loaded.");
@@ -3087,10 +3089,10 @@ function togglePause() {
     }
     if (window.gamePaused) {
         backgroundSound.pause();
-        console.log("Game paused, background music paused.");
+        // console.log("Game paused, background music paused.");
     } else {
         backgroundSound.play();
-        console.log("Game resumed, background music playing.");
+        // console.log("Game resumed, background music playing.");
     }
     updateHUD(); // Call updateHUD to reflect the new game state
     console.log(`Game ${window.gamePaused ? 'paused' : 'resumed'}`);
@@ -3145,9 +3147,9 @@ async function resetGame() {
     updateHUD(); // Call updateHUD here to reset the HUD
     drawGrid();  
 
-    console.log("Game reset: currentWave:", currentWave, ", wave:", wave, ", score:", score);
-    console.log("After reset: enemiesOnField:", enemiesOnField.length, ", wraithsOnField:", wraithsOnField.length);
-    console.log("Wave data after reset:", waves[0]);
+    // console.log("Game reset: currentWave:", currentWave, ", wave:", wave, ", score:", score);
+    // console.log("After reset: enemiesOnField:", enemiesOnField.length, ", wraithsOnField:", wraithsOnField.length);
+    // console.log("Wave data after reset:", waves[0]);
 }
 // End of reset game function
 
@@ -3252,8 +3254,10 @@ function updateGameState(deltaTime) {
 
         holes.forEach(hole => hole.update());
         if (holes.some(hole => hole.buggiesSpawned)) {
-            console.log(`Score when Buggy from hole spawned: ${enemiesKilled}`);
+            console.log(`Score when Buggy from hole spawned: ${enemiesKilled}, Holes active:", holes.length}`);
         }
+    } else {
+        console.log("No holes active at this time.");
     }
 
     // Removed score-based hole spawning logic here
@@ -3264,6 +3268,8 @@ function renderGame() {
     drawGrid();
     if (holes && holes.length > 0) {
         holes.forEach(hole => hole.draw());
+    } else {
+        console.log("No holes to render.");
     }
 }
 // End of game loop function
@@ -3291,7 +3297,9 @@ function spawnHole() {
             let newHole = new Hole(position.x, position.y);
             holes.push(newHole);
             alarmSound.play();
-            console.log("Alarm sound played for hole spawn at", position.x, position.y);
+            console.log("Hole spawned at position:", position.x, position.y);
+        } else {
+            console.error("Failed to find a valid position for hole spawn in manual/dev mode");
         }
     }
 }
@@ -3310,13 +3318,17 @@ function getRandomEmptyTileAwayFromPesticide() {
             }
         }
     }
-    return validTiles.length ? validTiles[Math.floor(Math.random() * validTiles.length)] : null;
+    if (validTiles.length === 0) {
+        console.error("No valid tiles found for hole spawn (all tiles blocked or too close to Pesticide towers)");
+        return null;
+    }
+    return validTiles[Math.floor(Math.random() * validTiles.length)];
 }
 
 class Hole {
     constructor(x, y, holeData = {}) {
-        this.x = x;
-        this.y = y;
+        this.x = Math.max(0, Math.min(gridWidth - 1, x)); // Ensure within grid bounds
+        this.y = Math.max(0, Math.min(gridHeight - 1, y)); // Ensure within grid bounds
         this.size = 0;
         this.maxSize = tileSize * 0.75;
         this.startTime = performance.now();
@@ -3349,7 +3361,7 @@ class Hole {
         if (this.size <= 0) {
             let index = holes.indexOf(this);
             if (index !== -1) holes.splice(index, 1);
-            // console.log("Hole at", this.x, this.y, "has completely faded away");
+            console.log("Hole at", this.x, this.y, "has completely faded away");
         }
     }
 
@@ -3370,11 +3382,13 @@ class Hole {
             let newBuggy = createBuggyFromHole(this.x, this.y, hpMultiplier, speedMultiplier);
             if (newBuggy) {
                 newBuggy.type = 'buggyFromHole'; 
+                newBuggy.x = Math.max(0.5, Math.min(gridWidth - 0.5, newBuggy.x)); // Ensure within grid bounds
+                newBuggy.y = Math.max(0.5, Math.min(gridHeight - 0.5, newBuggy.y)); // Ensure within grid bounds
                 enemiesOnField.push(newBuggy);
                 this.buggiesFromHole.push(newBuggy);
-                // console.log("Buggy spawned from hole", newBuggy.name, "at", newBuggy.x, newBuggy.y);
+                console.log("Buggy spawned from hole at", newBuggy.x, newBuggy.y, "with HP:", newBuggy.hp, "Speed:", newBuggy.speed);
             } else {
-                console.error("Failed to create buggy");
+                console.error("Failed to create buggy for hole at", this.x, this.y);
             }
         }
         this.buggiesSpawned = true;  // Set this flag when Buggies are actually spawned
@@ -3384,7 +3398,7 @@ class Hole {
         const fadeElapsed = (currentTime - this.fadeStartTime) / 1000;
         if (fadeElapsed < 5) {  
             this.size = Math.max(0, this.size - (this.maxSize / 500)); 
-            // console.log("Hole fading: Current size:", this.size.toFixed(2));
+            console.log("Hole fading at", this.x, this.y, "Current size:", this.size.toFixed(2));
         } else {
             this.size = 0;
         }
@@ -3395,7 +3409,7 @@ class Hole {
         if (currentTime - this.startTime >= totalTime * 1000) { // Convert to milliseconds
             if (!this.fadeStartTime) {
                 this.fadeStartTime = currentTime;
-                // console.log("Auto fade-out initiated for hole at", this.x, this.y);
+                console.log("Auto fade-out initiated for hole at", this.x, this.y);
             }
             this.fadeOut(currentTime);
         }
@@ -3433,7 +3447,7 @@ function removeBuggyFromHole(enemy) {
             let index = hole.buggiesFromHole.indexOf(enemy);
             if (index !== -1) {
                 hole.buggiesFromHole.splice(index, 1);
-                // console.log("Buggy from hole removed. Remaining:", hole.buggiesFromHole.length);
+                console.log("Buggy from hole removed at", hole.x, hole.y, ". Remaining:", hole.buggiesFromHole.length);
             }
         });
     }
@@ -3668,7 +3682,7 @@ if (canvas) {
                     if (clickedTower) {
                         // If a placed tower is clicked, we switch to viewing mode
                         selectedTower = clickedTower;
-                        console.log('Viewing tower:', selectedTower.name, 'at', selectedTower.x, selectedTower.y);
+                        // console.log('Viewing tower:', selectedTower.name, 'at', selectedTower.x, selectedTower.y);
 
                         // Remove existing tooltips for both towers and enemies
                         const existingTooltips = document.querySelectorAll('.tower-stats-tooltip, .enemy-stats-tooltip');
@@ -3719,7 +3733,7 @@ if (canvas) {
                     } else {
                         // If no tower is selected for placement and no tower is clicked, clear selection
                         selectedTower = null;
-                        console.log('No tower selected, clearing selection');
+                        // console.log('No tower selected, clearing selection');
                         drawGrid(); // Clear any range ring if no tower is selected
                     }
                 }
@@ -3950,7 +3964,7 @@ function createTowerButtons() {
 
             button.addEventListener('click', () => {
                 selectTower(tower.id);
-                console.log(`Selected tower ${tower.name}. HP: ${tower.hp}, MaxHP: ${tower.hp}`);
+                // console.log(`Selected tower ${tower.name}. HP: ${tower.hp}, MaxHP: ${tower.hp}`);
             });
             towerButtonsDiv.appendChild(button);
         });
@@ -4037,7 +4051,7 @@ function upgradeTower(tower) {
         // Play upgrade sound once when tower is upgraded
         if (!window.gamePaused) {
             upgradeSound.play();
-            console.log(`Upgrade sound played for ${tower.name} at level ${tower.upgradeLevel}`);
+            // console.log(`Upgrade sound played for ${tower.name} at level ${tower.upgradeLevel}`);
         }
 
         console.log('After Upgrade:', { 
@@ -4689,7 +4703,7 @@ function showGameCompleted() {
 
     // Play win sound once when game is completed
     winSound.play();
-    console.log("Win sound played for game completion");
+    // console.log("Win sound played for game completion");
 
     // Add a button for replay if needed
     const replayButton = document.createElement('button');
@@ -4929,7 +4943,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Add click event listener to document for debugging
     document.addEventListener('click', (event) => {
-        console.log('Document click:', event.clientX, event.clientY);
+        // console.log('Document click:', event.clientX, event.clientY);
     });
 
     // Keyboard shortcut for toggling dev mode
@@ -5064,11 +5078,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (waveDelayCountdown > 0) {
             const pointsBonus = Math.floor(waveDelayCountdown * 10);
             score += pointsBonus; 
-            console.log(`Skipped wave delay. Bonus points: ${pointsBonus}. New Score: ${score}`);
+            // console.log(`Skipped wave delay. Bonus points: ${pointsBonus}. New Score: ${score}`);
             
             if (!window.gamePaused) {
                 skipSound.play();
-                console.log("Skip sound played");
+                // console.log("Skip sound played");
             }
 
             waveDelayCountdown = 0;
@@ -5143,7 +5157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     musicSlider.addEventListener('input', (e) => {
         const volume = e.target.value / 100;
         backgroundSound.volume(volume);
-        console.log(`Music volume set to ${volume}`);
+        // console.log(`Music volume set to ${volume}`);
     });
 
     const sfxSlider = document.getElementById('sfxVolume');
@@ -5158,7 +5172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         yaySound.volume(volume);
         fartSound.volume(volume);
         winSound.volume(volume);
-        console.log(`SFX volume set to ${volume}`);
+        // console.log(`SFX volume set to ${volume}`);
     });
 
     settingsPanel.addEventListener('click', (e) => {
