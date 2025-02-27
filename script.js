@@ -473,7 +473,10 @@ async function loadWaves(difficulty) {
                         ],
                         hpMultiplier: 1,
                         speedMultiplier: 1,
-                        wave_delay: 10000
+                        wave_delay: 10000,
+                        hole: {
+                            spawn: false
+                        }
                     }
                 ];
             } else {
@@ -483,6 +486,7 @@ async function loadWaves(difficulty) {
     }
 }
 // End of wave system update
+
 
 
 // Start of Spawn Enemies for Waves
@@ -562,6 +566,8 @@ function spawnEnemiesForWave() {
                                         name: enemyData.name
                                     };
                                     enemiesOnField.push(newEnemy);
+                                } else if (type === 12) { // Hole
+                                    spawnHoleFromWave(wave.hole, entryPoint);
                                 } else {
                                     newEnemy = {
                                         type: gateIndex === 0 ? '1a' : '1b',
@@ -582,12 +588,12 @@ function spawnEnemiesForWave() {
                                     enemiesOnField.push(newEnemy);
                                 }
 
-                                if (isNaN(newEnemy.x) || isNaN(newEnemy.y) || newEnemy.speed === undefined) {
+                                if (isNaN(newEnemy?.x) || isNaN(newEnemy?.y) || newEnemy?.speed === undefined) {
                                     console.error("Invalid enemy properties:", newEnemy);
                                     if (type === 10) wraithsOnField.pop();
-                                    else enemiesOnField.pop();
+                                    else if (type !== 12) enemiesOnField.pop(); // Don't pop for Hole
                                 } else {
-                                    if (enemiesToSpawn === count) {
+                                    if (enemiesToSpawn === count && type !== 12) {
                                         // console.log(`${new Date().toISOString()} First ${enemyData.name} spawned with HP: ${newEnemy.hp}, Speed: ${newEnemy.speed.toFixed(2)}`);
                                     }
                                 }
@@ -616,6 +622,10 @@ function spawnEnemiesForWave() {
                                                 }
                                             });
                                         }
+                                        // Spawn hole if specified in wave data
+                                        if (wave.hole && wave.hole.spawn) {
+                                            spawnHoleFromWave(wave.hole);
+                                        }
                                     }
                                 }
                             }
@@ -631,6 +641,10 @@ function spawnEnemiesForWave() {
                                 spawnEnemiesForWave();
                             }
                         });
+                        // Spawn hole if specified in wave data
+                        if (wave.hole && wave.hole.spawn) {
+                            spawnHoleFromWave(wave.hole);
+                        }
                     }
                 }
                 spawnNextEnemyType();
@@ -643,12 +657,28 @@ function spawnEnemiesForWave() {
                         spawnEnemiesForWave();
                     }
                 });
+                // Spawn hole if specified in wave data
+                if (wave.hole && wave.hole.spawn) {
+                    spawnHoleFromWave(wave.hole);
+                }
             }
         } else {
             // console.log("All waves spawned. Game will end when all enemies are cleared.");
         }
     } else {
         // console.log("Game is not in a state to spawn enemies.");
+    }
+}
+
+// Helper function to spawn hole based on wave data
+function spawnHoleFromWave(holeData, entryPoint = null) {
+    let position = entryPoint || getRandomEmptyTileAwayFromPesticide();
+    if (position) {
+        let newHole = new Hole(position.x, position.y, holeData);
+        if (!holes) holes = [];
+        holes.push(newHole);
+        alarmSound.play();
+        console.log("Alarm sound played for hole spawn at", position.x, position.y, "with data:", holeData);
     }
 }
 // End of Spawn Enemies for Waves
@@ -2374,15 +2404,15 @@ function drawGrid() {
     }
 
     drawEnemies();
-    drawWraiths(); 
+    drawWraiths();
     drawBullets();
     drawRockets();
     drawLightBullets();
     drawSpecialEffects();
 
-    // Draw the hole if it exists
-    if (hole) {
-        hole.draw();
+    // Draw all holes if they exist
+    if (holes && holes.length > 0) {
+        holes.forEach(hole => hole.draw());
     }
 
     if (devMode) {
@@ -2391,7 +2421,6 @@ function drawGrid() {
         ctx.fillText(`FPS: ${fps}`, 10, 20);
     }
 }
-
 // End of grid drawing function
 
 
@@ -2583,6 +2612,8 @@ function drawTowers() {
 }
 // End of towers drawing function
 
+
+
 // Start of enemies drawing function
 function drawEnemies() {
     enemiesOnField.forEach(enemy => {
@@ -2622,14 +2653,14 @@ function drawEnemies() {
             // Draw eyes
             ctx.fillStyle = "#FFFFFF";
             ctx.beginPath();
-            ctx.arc(enemyX - eyeSpacing, enemyY - verticalOffset, eyeSize, 0, Math.PI * 2);
-            ctx.arc(enemyX + eyeSpacing, enemyY - verticalOffset, eyeSize, 0, Math.PI * 2);
+            ctx.arc(enemyX - eyeSpacing / 2, enemyY - verticalOffset, eyeSize, 0, Math.PI * 2);
+            ctx.arc(enemyX + eyeSpacing / 2, enemyY - verticalOffset, eyeSize, 0, Math.PI * 2);
             ctx.fill();
 
             ctx.fillStyle = "black";
             ctx.beginPath();
-            ctx.arc(enemyX - eyeSpacing, enemyY - verticalOffset, pupilSize, 0, Math.PI * 2);
-            ctx.arc(enemyX + eyeSpacing, enemyY - verticalOffset, pupilSize, 0, Math.PI * 2);
+            ctx.arc(enemyX - eyeSpacing / 2, enemyY - verticalOffset, pupilSize, 0, Math.PI * 2);
+            ctx.arc(enemyX + eyeSpacing / 2, enemyY - verticalOffset, pupilSize, 0, Math.PI * 2);
             ctx.fill();
 
             // Draw health bar for Buggy
@@ -2648,33 +2679,34 @@ function drawEnemies() {
             }
             
             // If there's a hole at this Buggy's position, draw the hole below the Buggy
-            if (hole && hole.x === Math.floor(enemy.x) && hole.y === Math.floor(enemy.y)) {
-                ctx.globalAlpha = 0.8; // slight transparency for visibility
-                hole.draw();
-                ctx.globalAlpha = 1;
+            if (holes && holes.length > 0) {
+                const currentHole = holes.find(h => Math.floor(h.x) === Math.floor(enemy.x) && Math.floor(h.y) === Math.floor(enemy.y));
+                if (currentHole) {
+                    ctx.globalAlpha = 0.8; // slight transparency for visibility
+                    currentHole.draw();
+                    ctx.globalAlpha = 1;
+                }
             }
         } else {
-
             // Drawing other enemies with their correct color
-ctx.fillStyle = enemy.color;
-ctx.beginPath();
-ctx.arc(enemyX, enemyY, bodySize, 0, Math.PI * 2);
-ctx.fill();
+            ctx.fillStyle = enemy.color;
+            ctx.beginPath();
+            ctx.arc(enemyX, enemyY, bodySize, 0, Math.PI * 2);
+            ctx.fill();
 
-if (enemy.hp !== undefined && enemy.maxHP !== undefined) {
-    const healthBarWidth = bodySize * 2; // Full width of the health bar
-    const healthBarHeight = bodySize / 8; // Height of the health bar
-    const healthBarX = enemyX - healthBarWidth / 2; // Center the health bar on the enemy
-    const healthBarY = enemyY - bodySize - healthBarHeight; // Position above the enemy
+            if (enemy.hp !== undefined && enemy.maxHP !== undefined) {
+                const healthBarWidth = bodySize * 2; // Full width of the health bar
+                const healthBarHeight = bodySize / 8; // Height of the health bar
+                const healthBarX = enemyX - healthBarWidth / 2; // Center the health bar on the enemy
+                const healthBarY = enemyY - bodySize - healthBarHeight; // Position above the enemy
 
-    ctx.fillStyle = "#8B0000"; // Background color for the health bar
-    ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
+                ctx.fillStyle = "#8B0000"; // Background color for the health bar
+                ctx.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
 
-    const healthPercentage = Math.max(0, Math.min(1, enemy.hp / enemy.maxHP)); // Ensure percentage is between 0 and 1
-    ctx.fillStyle = "#FF0000"; // Color for the current health
-    ctx.fillRect(healthBarX, healthBarY, healthBarWidth * healthPercentage, healthBarHeight);
-}
-
+                const healthPercentage = Math.max(0, Math.min(1, enemy.hp / enemy.maxHP)); // Ensure percentage is between 0 and 1
+                ctx.fillStyle = "#FF0000"; // Color for the current health
+                ctx.fillRect(healthBarX, healthBarY, healthBarWidth * healthPercentage, healthBarHeight);
+            }
 
             let nextStep = flowField[enemy.type === '1a' ? 0 : 1][Math.floor(enemy.y)][Math.floor(enemy.x)];
             if (nextStep) {
@@ -3180,7 +3212,7 @@ function updateGameState(deltaTime) {
         if (currentWave === waves.length && 
             enemiesOnField.length === 0 && 
             wraithsOnField.length === 0 && 
-            (!hole || !holeActive)) {
+            (!holes || holes.length === 0)) {
             showGameCompleted();
             gameStarted = false;
             console.log("All waves completed and enemies cleared. Game won!");
@@ -3201,8 +3233,7 @@ function updateGameState(deltaTime) {
     updateHUD();
     gameTimer.update();
     
-    if (hole) {
-        hole.update();
+    if (holes && holes.length > 0) {
         let killedEnemies = [];
         enemiesOnField = enemiesOnField.filter(enemy => {
             if (enemy.hp <= 0) {
@@ -3219,21 +3250,21 @@ function updateGameState(deltaTime) {
             killEnemy(enemy, enemiesOnField);
         });
 
-        if (hole && hole.buggiesSpawned) {
+        holes.forEach(hole => hole.update());
+        if (holes.some(hole => hole.buggiesSpawned)) {
             console.log(`Score when Buggy from hole spawned: ${enemiesKilled}`);
         }
     }
 
-    let scoreSegment = Math.floor(enemiesKilled / 500) * 500;
-    if (enemiesKilled >= 400 + scoreSegment && enemiesKilled < 500 + scoreSegment && !holeActive) {
-        spawnHole();
-    }
-
+    // Removed score-based hole spawning logic here
     // console.log("Current enemies on field:", enemiesOnField.length, "Score:", enemiesKilled);
 }
 
 function renderGame() {
     drawGrid();
+    if (holes && holes.length > 0) {
+        holes.forEach(hole => hole.draw());
+    }
 }
 // End of game loop function
 
@@ -3250,16 +3281,16 @@ function removeBuggyFromHole(enemy) {
 
 
 // Start of Hole Mechanics Function
-let hole = null;
-let holeActive = false;
+let holes = [];
 
 function spawnHole() {
-    if (!holeActive) {
+    // This function is now only called manually or via dev mode, not automatically
+    if (!holes || holes.length === 0) {
         let position = getRandomEmptyTileAwayFromPesticide();
         if (position) {
-            hole = new Hole(position.x, position.y);
-            holeActive = true;
-            alarmSound.play(); // Play alarm sound once when hole spawns
+            let newHole = new Hole(position.x, position.y);
+            holes.push(newHole);
+            alarmSound.play();
             console.log("Alarm sound played for hole spawn at", position.x, position.y);
         }
     }
@@ -3283,7 +3314,7 @@ function getRandomEmptyTileAwayFromPesticide() {
 }
 
 class Hole {
-    constructor(x, y) {
+    constructor(x, y, holeData = {}) {
         this.x = x;
         this.y = y;
         this.size = 0;
@@ -3292,11 +3323,10 @@ class Hole {
         this.buggiesSpawned = false;
         this.buggiesFromHole = [];
         this.fadeStartTime = null;
+        this.holeData = holeData; // Store wave-specific hole data
     }
 
     update() {
-        if (!hole) return;  // Check if hole is null before updating
-
         const currentTime = performance.now();
         const elapsed = (currentTime - this.startTime) / 1000;
 
@@ -3316,16 +3346,14 @@ class Hole {
         // Auto fade-out after a fixed time
         this.autoFadeOut(currentTime);
 
-        if (this.size <= 0 && holeActive) {
-            holeActive = false;
-            hole = null;  // Setting hole to null here should prevent further access
+        if (this.size <= 0) {
+            let index = holes.indexOf(this);
+            if (index !== -1) holes.splice(index, 1);
             // console.log("Hole at", this.x, this.y, "has completely faded away");
         }
     }
 
     draw() {
-        if (!hole) return;  // Don't draw if hole doesn't exist
-
         ctx.save();
         ctx.fillStyle = "rgba(0,0,0,0.5)"; 
         ctx.beginPath();
@@ -3335,10 +3363,11 @@ class Hole {
     }
 
     spawnBuggies() {
-        const maxBuggies = 3; // Maximum number of Buggies per spawn
-        const buggyCount = Math.min(Math.floor(Math.random() * 3) + 1, maxBuggies); // Ensure no more than maxBuggies
+        const buggyCount = this.holeData.buggyCount || 1; // Default to 1 if not specified
+        const hpMultiplier = this.holeData.hpMultiplier || 1.0; // Default to 1.0
+        const speedMultiplier = this.holeData.speedMultiplier || 1.0; // Default to 1.0
         for (let i = 0; i < buggyCount; i++) {
-            let newBuggy = createBuggyFromHole(this.x, this.y);
+            let newBuggy = createBuggyFromHole(this.x, this.y, hpMultiplier, speedMultiplier);
             if (newBuggy) {
                 newBuggy.type = 'buggyFromHole'; 
                 enemiesOnField.push(newBuggy);
@@ -3373,7 +3402,7 @@ class Hole {
     }
 }
 
-function createBuggyFromHole(x, y) {
+function createBuggyFromHole(x, y, hpMultiplier = 1.0, speedMultiplier = 1.0) {
     const enemyData = enemies.find(e => e.name === "Buggy");
     if (!enemyData) {
         console.error("No enemy data found for 'Buggy'");
@@ -3385,11 +3414,11 @@ function createBuggyFromHole(x, y) {
         y: y + 0.5,
         path: [],
         color: enemyData.color,
-        speed: enemyData.speed,
+        speed: enemyData.speed * speedMultiplier,
         speedMultiplier: 1.0,
         stunned: false,
-        hp: enemyData.hp,
-        maxHP: enemyData.hp,
+        hp: Math.floor(enemyData.hp * hpMultiplier),
+        maxHP: Math.floor(enemyData.hp * hpMultiplier),
         value: enemyData.value,
         bodySize: enemyData.bodySize,
         element: enemyData.element,
@@ -3399,12 +3428,14 @@ function createBuggyFromHole(x, y) {
 }
 
 function removeBuggyFromHole(enemy) {
-    if (hole && hole.buggiesFromHole) { // Double check if hole exists and has the array
-        let index = hole.buggiesFromHole.indexOf(enemy);
-        if (index !== -1) {
-            hole.buggiesFromHole.splice(index, 1);
-            // console.log("Buggy from hole removed. Remaining:", hole.buggiesFromHole.length);
-        }
+    if (holes && holes.length > 0) {
+        holes.forEach(hole => {
+            let index = hole.buggiesFromHole.indexOf(enemy);
+            if (index !== -1) {
+                hole.buggiesFromHole.splice(index, 1);
+                // console.log("Buggy from hole removed. Remaining:", hole.buggiesFromHole.length);
+            }
+        });
     }
 }
 // End of Hole Mechanics Function
@@ -4961,7 +4992,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.body.appendChild(waveSelectionDiv);
 
     const wavePatterns = [
-        { name: "Regular Easy", desc: "20 waves of moderate enemies, a balanced start.", file: "easy" },
+        { name: "Regular Easy", desc: "30 waves of moderate enemies, a balanced start.", file: "easy" },
         { name: "Regular Hard", desc: "75 waves of tougher enemies, a long challenge.", file: "hard" },
         { name: "Boss Mode", desc: "Fewer waves, but packed with high-HP bosses.", file: "boss_mode" },
         { name: "Buggy Infestation", desc: "Increased Buggy spawns and holes!", file: "buggy_infest" },
