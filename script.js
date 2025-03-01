@@ -144,23 +144,23 @@ const towers = [
         ]
     },
     { 
-        name: "Freeze", 
-        fireRate: 0.4, 
-        damage: 2, 
-        range: 3, 
-        cost: 250, 
-        color: 'cyan', 
-        id: 6, 
-        element: 'Ice', 
-        hp: 40, 
-        maxHP: 40,
-        upgradeLevel: 0,
-        upgrades: [
-            { fireRate: 0.4, damage: 2, range: 3 },
-            { fireRate: 0.6, damage: 4, range: 2 }, // Level 1 upgrade
-            { fireRate: 0.4, damage: 7, range: 3 }    // Level 2 upgrade
-        ]
-    },
+    name: "Freeze", 
+    fireRate: 0.4, 
+    damage: 2, 
+    range: 3, 
+    cost: 250, 
+    color: 'cyan', 
+    id: 6, 
+    element: 'Ice', 
+    hp: 40, 
+    maxHP: 40,
+    upgradeLevel: 0,
+    upgrades: [
+        { fireRate: 0.4, damage: 2, range: 3, slowMultiplier: 0.4 }, // 60% slow
+        { fireRate: 0.6, damage: 4, range: 2, slowMultiplier: 0.3 }, // 70% slow
+        { fireRate: 0.4, damage: 7, range: 3, slowMultiplier: 0.2 }  // 80% slow
+    ]
+},
     { 
         name: "Aqua", 
         fireRate: 0.3, 
@@ -678,7 +678,7 @@ function spawnHoleFromWave(holeData, entryPoint = null) {
         if (!holes) holes = [];
         holes.push(newHole);
         alarmSound.play();
-        console.log("Hole spawned at position:", position.x, position.y, "with data:", holeData);
+        // console.log("Hole spawned at position:", position.x, position.y, "with data:", holeData);
     } else {
         console.error("Failed to find a valid position for hole spawn in wave", currentWave, "with data:", holeData);
     }
@@ -1101,7 +1101,7 @@ class Bullet {
                     const oldHP = enemy.hp;
                     
                     enemy.hp -= damageDealt;
-                    // console.log(`${this.tower.name} hit ${enemy.name} - HP reduced from ${oldHP} to ${enemy.hp}, Damage: ${damageDealt}`);
+                    console.log(`${this.tower.name} hit ${enemy.name} - HP reduced from ${oldHP} to ${enemy.hp}, Damage: ${damageDealt}`);
                     
                     this.tower.damageDealt = damageDealt;
                     this.damageApplied = true;
@@ -1145,36 +1145,55 @@ class Rocket {
         this.color = color;
         this.direction = direction;
         this.speed = speed;
-        this.radius = 5; 
+        this.radius = 5;
         this.damage = damage;
         this.exploded = false;
         this.tower = tower;
-        this.explosionRadius = tower.explosionRadius || 100; 
+        this.explosionRadius = tower.explosionRadius || 100;
         this.explosionTime = 0;
-        this.damageDealt = 0; // Track damage dealt in one update cycle
+        this.damageDealt = 0;
+        this.rocketId = Date.now() + Math.random();
+        // console.log(`Rocket #${this.rocketId} created at (${this.x.toFixed(2)}, ${this.y.toFixed(2)}) from Tower at (${tower.x}, ${tower.y})`);
     }
 
     update(deltaTime) {
-        if (!this.exploded) {
-            this.x += Math.cos(this.direction) * this.speed * deltaTime;
-            this.y += Math.sin(this.direction) * this.speed * deltaTime;
-            if (this.checkCollision() || this.distanceTraveled() > this.tower.range * tileSize) {
-                this.explode();
-            }
-        } else {
+        if (this.exploded) {
             this.explosionTime++;
-            if (this.explosionTime > 10) { 
-                return true; 
+            if (this.explosionTime > 10) {
+                // console.log(`Rocket #${this.rocketId} explosion completed after ${this.explosionTime} frames`);
+                return true; // Remove rocket after explosion animation
             }
+            return false;
         }
+
+        // Move rocket
+        this.x += Math.cos(this.direction) * this.speed * deltaTime;
+        this.y += Math.sin(this.direction) * this.speed * deltaTime;
+
+        // Check bounds first
+        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+            // console.log(`Rocket #${this.rocketId} out of bounds at (${this.x.toFixed(2)}, ${this.y.toFixed(2)}), triggering explosion`);
+            this.explode();
+            return false;
+        }
+
+        // Single point to trigger explosion
+        if (this.checkCollision() || this.distanceTraveled() > this.tower.range * tileSize) {
+            // console.log(`Rocket #${this.rocketId} triggering explosion at (${this.x.toFixed(2)}, ${this.y.toFixed(2)})`);
+            this.explode();
+            return false;
+        }
+
         return false;
     }
 
     checkCollision() {
+        if (this.exploded) return false; // Skip if already exploded
+
         for (let enemy of enemiesOnField) {
             if (Math.hypot(enemy.x * tileSize - this.x, enemy.y * tileSize - this.y) < enemy.bodySize + this.radius) {
-                this.explode();
-                return true;
+                // console.log(`Rocket #${this.rocketId} collided with ${enemy.name} at (${enemy.x.toFixed(2)}, ${enemy.y.toFixed(2)})`);
+                return true; // Collision detected, explosion will be handled in update
             }
         }
         return false;
@@ -1185,54 +1204,65 @@ class Rocket {
     }
 
     explode() {
-    if (this.exploded) return;
-    this.exploded = true;
-    
-    this.damageDealt = 0;
-    let enemiesHit = [];
-
-    enemiesOnField.forEach(enemy => {
-        if (Math.hypot(this.x - enemy.x * tileSize, this.y - enemy.y * tileSize) < this.explosionRadius) {
-            enemiesHit.push(enemy);
+        if (this.exploded) {
+            console.warn(`Rocket #${this.rocketId} attempted to explode multiple times at (${this.x.toFixed(2)}, ${this.y.toFixed(2)})`);
+            return; // Prevent multiple explosions
         }
-    });
 
-    enemiesHit.forEach(enemy => {
-        let damageMultiplier = calculateElementDamage(this.tower.element, enemy.element);
-        const individualDamage = this.damage * damageMultiplier;
-        const oldHP = enemy.hp;
+        this.exploded = true;
+        this.damageDealt = 0;
+        let enemiesHit = [];
 
-        enemy.hp -= individualDamage;
-        this.damageDealt += individualDamage;
-        if (enemy.hp <= 0) {
-            killEnemy(enemy, enemiesOnField);
+        enemiesOnField.forEach(enemy => {
+            if (Math.hypot(this.x - enemy.x * tileSize, this.y - enemy.y * tileSize) < this.explosionRadius) {
+                enemiesHit.push(enemy);
+            }
+        });
+
+        if (enemiesHit.length > 0) {
+            // console.log(`Rocket #${this.rocketId} Explosion at (${this.x.toFixed(2)}, ${this.y.toFixed(2)}) - Radius: ${this.explosionRadius}, Enemies Hit: ${enemiesHit.length}`);
         }
-    });
 
-    if (enemiesHit.length > 0) {
-        // console.log(`${this.tower.name} Explosion Total Damage: ${this.damageDealt}`);
+        enemiesHit.forEach(enemy => {
+            let damageMultiplier = calculateElementDamage(this.tower.element, enemy.element);
+            const individualDamage = this.damage * damageMultiplier;
+            const oldHP = enemy.hp;
+
+            enemy.hp -= individualDamage;
+            this.damageDealt += individualDamage;
+            console.log(`Rocket #${this.rocketId} hit ${enemy.name} at (${enemy.x.toFixed(2)}, ${enemy.y.toFixed(2)}) - Damage: ${individualDamage.toFixed(2)}, Old HP: ${oldHP.toFixed(2)}, New HP: ${enemy.hp.toFixed(2)}, Multiplier: ${damageMultiplier}x`);
+
+            if (enemy.hp <= 0) {
+                killEnemy(enemy, enemiesOnField);
+            }
+        });
+
+        if (enemiesHit.length > 0) {
+            // console.log(`Rocket #${this.rocketId} Explosion Total Damage: ${this.damageDealt.toFixed(2)} to ${enemiesHit.length} enemies`);
+        }
+        this.tower.damageDealt = (this.tower.damageDealt || 0) + this.damageDealt;
+        console.log(`Total Rocket Damage for Tower at (${this.tower.x}, ${this.tower.y}) - Level ${this.tower.upgradeLevel}: ${this.tower.damageDealt.toFixed(2)}`);
     }
-    this.tower.damageDealt += this.damageDealt;
-}
 
     draw() {
-        if (!this.exploded) {
+        if (!this.exploded && this.explosionTime === 0) {
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             ctx.fillStyle = this.color;
             ctx.fill();
-        } else {
-            ctx.globalAlpha = 0.5 - (this.explosionTime / 20); 
+            // console.log(`Drawing Rocket #${this.rocketId} at (${this.x.toFixed(2)}, ${this.y.toFixed(2)})`);
+        } else if (this.exploded && this.explosionTime <= 10) {
+            ctx.globalAlpha = 0.5 - (this.explosionTime / 20);
             ctx.fillStyle = 'orange';
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.explosionRadius * (1 - this.explosionTime / 20), 0, Math.PI * 2);
             ctx.fill();
-            ctx.globalAlpha = 1; 
+            ctx.globalAlpha = 1;
+            // console.log(`Drawing Explosion for Rocket #${this.rocketId} at (${this.x.toFixed(2)}, ${this.y.toFixed(2)}) - Frame: ${this.explosionTime}`);
         }
     }
 }
 // End of Rocket class definition
-
 
 
 
@@ -1620,169 +1650,137 @@ function updateTowers(deltaTime) {
             if (tower.name !== "Wall" && enemiesInRange.length > 0) {
                 playTowerShootSound(tower); // Call with validated tower object
                 let damageMultiplier = 1;
-                enemiesInRange.forEach(enemy => {
-                    if (tower.element && enemy.element) {
-                        damageMultiplier = calculateElementDamage(tower.element, enemy.element);
+                let nearestEnemy = null;
+                let minDistance = Infinity;
+
+                enemiesInRange.forEach(e => {
+                    const distance = Math.hypot((tower.x + 0.5) * tileSize - e.x * tileSize, (tower.y + 0.5) * tileSize - e.y * tileSize);
+                    if (distance < minDistance) {
+                        nearestEnemy = e;
+                        minDistance = distance;
+                    }
+                });
+
+                if (nearestEnemy) {
+                    if (tower.element && nearestEnemy.element) {
+                        damageMultiplier = calculateElementDamage(tower.element, nearestEnemy.element);
                     }
 
                     let actualDamage = tower.damage * damageMultiplier;
 
                     switch(tower.name) {
                         case "Flame":
-                            const oldHPFlame = enemy.hp;
-                            enemy.hp -= actualDamage;
-                            // console.log(`${tower.name} hit ${enemy.name} - HP reduced from ${oldHPFlame} to ${enemy.hp}, Damage: ${actualDamage}`);
+                            const oldHPFlame = nearestEnemy.hp;
+                            nearestEnemy.hp -= actualDamage;
+                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPFlame} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
                             tower.damageDealt += actualDamage;
                             break;
                         case "Freeze":
-                            enemy.speedMultiplier = 0.5;
-                            const oldHPFreeze = enemy.hp;
-                            enemy.hp -= actualDamage;
-                            // console.log(`${tower.name} applied freeze effect to ${enemy.name} - HP reduced from ${oldHPFreeze} to ${enemy.hp}, Damage: ${actualDamage}`);
+                            nearestEnemy.speedMultiplier = tower.upgrades[tower.upgradeLevel].slowMultiplier; // Use upgrade-specific slow
+                            const oldHPFreeze = nearestEnemy.hp;
+                            nearestEnemy.hp -= actualDamage;
+                            console.log(`${tower.name} applied freeze effect to ${nearestEnemy.name} - HP reduced from ${oldHPFreeze} to ${nearestEnemy.hp}, Damage: ${actualDamage}, Slowed to ${(1 - tower.upgrades[tower.upgradeLevel].slowMultiplier) * 100}%`);
                             tower.damageDealt += actualDamage;
                             break;
                         case "Aqua":
-                            let nearestEnemyAqua = null;
-                            let minDistanceAqua = Infinity;
-                            enemiesInRange.forEach(e => {
-                                const distance = Math.hypot((tower.x + 0.5) * tileSize - e.x * tileSize, (tower.y + 0.5) * tileSize - e.y * tileSize);
-                                if (distance < minDistanceAqua) {
-                                    nearestEnemyAqua = e;
-                                    minDistanceAqua = distance;
-                                }
-                            });
-                            if (nearestEnemyAqua) {
-                                let damageMultiplier = calculateElementDamage(tower.element, nearestEnemyAqua.element);
-                                const damageDealt = tower.damage * damageMultiplier;
-                                const oldHPAqua = nearestEnemyAqua.hp;
-                                nearestEnemyAqua.hp -= damageDealt;
-                                // console.log(`${tower.name} hit ${nearestEnemyAqua.name} - HP reduced from ${oldHPAqua} to ${nearestEnemyAqua.hp}, Damage: ${damageDealt}`);
-                                tower.damageDealt += damageDealt;
-                                createAquaStreamEffect(tower, nearestEnemyAqua);
-                            }
+                            let damageMultiplierAqua = calculateElementDamage(tower.element, nearestEnemy.element);
+                            const damageDealtAqua = tower.damage * damageMultiplierAqua;
+                            const oldHPAqua = nearestEnemy.hp;
+                            nearestEnemy.hp -= damageDealtAqua;
+                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPAqua} to ${nearestEnemy.hp}, Damage: ${damageDealtAqua}`);
+                            tower.damageDealt += damageDealtAqua;
+                            createAquaStreamEffect(tower, nearestEnemy);
                             break;
                         case "Gale":
-                            let nearestEnemyGale = null;
-                            let minDistanceGale = Infinity;
-                            enemiesInRange.forEach(e => {
-                                const distance = Math.hypot((tower.x + 0.5) * tileSize - e.x * tileSize, (tower.y + 0.5) * tileSize - e.y * tileSize);
-                                if (distance < minDistanceGale) {
-                                    nearestEnemyGale = e;
-                                    minDistanceGale = distance;
-                                }
-                            });
-                            if (nearestEnemyGale) {
-                                nearestEnemyGale.speedMultiplier = 0.8;
-                                let damageMultiplier = calculateElementDamage(tower.element, nearestEnemyGale.element);
-                                const damageDealt = tower.damage * damageMultiplier;
-                                const oldHPGale = nearestEnemyGale.hp;
-                                nearestEnemyGale.hp -= damageDealt;
-                                // console.log(`${tower.name} hit ${nearestEnemyGale.name} - HP reduced from ${oldHPGale} to ${nearestEnemyGale.hp}, Damage: ${damageDealt}`);
-                                tower.damageDealt += damageDealt;
-                                createWindBladeEffect(tower, nearestEnemyGale);
-                            }
+                            nearestEnemy.speedMultiplier = 0.8;
+                            let damageMultiplierGale = calculateElementDamage(tower.element, nearestEnemy.element);
+                            const damageDealtGale = tower.damage * damageMultiplierGale;
+                            const oldHPGale = nearestEnemy.hp;
+                            nearestEnemy.hp -= damageDealtGale;
+                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPGale} to ${nearestEnemy.hp}, Damage: ${damageDealtGale}`);
+                            tower.damageDealt += damageDealtGale;
+                            createWindBladeEffect(tower, nearestEnemy);
                             break;
                         case "Terra":
-                            let totalDamageTerra = 0;
-                            enemiesInRange.forEach(enemy => {
-                                enemy.stunned = true;
-                                let damageMultiplier = calculateElementDamage(tower.element, enemy.element);
-                                const damageDealt = tower.damage * damageMultiplier;
-                                const oldHPTerra = enemy.hp;
-                                enemy.hp -= damageDealt;
-                                // console.log(`${tower.name} hit ${enemy.name} - HP reduced from ${oldHPTerra} to ${enemy.hp}, Damage: ${damageDealt}`);
-                                totalDamageTerra += damageDealt;
-                            });
-                            // console.log(`${tower.name} Total Damage from Earthquake: ${totalDamageTerra}`);
-                            tower.damageDealt += totalDamageTerra;
+                            nearestEnemy.stunned = true;
+                            let damageMultiplierTerra = calculateElementDamage(tower.element, nearestEnemy.element);
+                            const damageDealtTerra = tower.damage * damageMultiplierTerra;
+                            const oldHPTerra = nearestEnemy.hp;
+                            nearestEnemy.hp -= damageDealtTerra;
+                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPTerra} to ${nearestEnemy.hp}, Damage: ${damageDealtTerra}`);
+                            tower.damageDealt += damageDealtTerra;
                             drawEarthquakeEffect(tower);
                             break;
                         case "Thunder":
-                            let nearestEnemyThunder = null;
-                            let minDistanceThunder = Infinity;
-                            enemiesInRange.forEach(e => {
-                                const distance = Math.hypot((tower.x + 0.5) * tileSize - e.x * tileSize, (tower.y + 0.5) * tileSize - e.y * tileSize);
-                                if (distance < minDistanceThunder) {
-                                    nearestEnemyThunder = e;
-                                    minDistanceThunder = distance;
-                                }
-                            });
-                            if (nearestEnemyThunder) {
-                                let damageMultiplier = calculateElementDamage(tower.element, nearestEnemyThunder.element);
-                                const damageDealt = tower.damage * damageMultiplier;
-                                const oldHPThunder = nearestEnemyThunder.hp;
-                                nearestEnemyThunder.hp -= damageDealt;
-                                // console.log(`${tower.name} hit ${nearestEnemyThunder.name} - HP reduced from ${oldHPThunder} to ${nearestEnemyThunder.hp}, Damage: ${damageDealt}`);
-                                tower.damageDealt += damageDealt;
-                                createLightningEffect(tower, nearestEnemyThunder);
-                            }
+                            let damageMultiplierThunder = calculateElementDamage(tower.element, nearestEnemy.element);
+                            const damageDealtThunder = tower.damage * damageMultiplierThunder;
+                            const oldHPThunder = nearestEnemy.hp;
+                            nearestEnemy.hp -= damageDealtThunder;
+                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPThunder} to ${nearestEnemy.hp}, Damage: ${damageDealtThunder}`);
+                            tower.damageDealt += damageDealtThunder;
+                            createLightningEffect(tower, nearestEnemy);
                             break;
                         case "Aero Cannon":
-                            if (enemiesInRange.length > 0) {
-                                createLightBullet(tower, enemiesInRange[0]);
-                            }
+                            createLightBullet(tower, nearestEnemy);
                             break;
                         case "Pesticide":
-                            enemiesInRange.forEach(buggy => {
-                                const oldHPPesticide = buggy.hp;
-                                buggy.hp -= actualDamage;
-                                // console.log(`${tower.name} hit ${buggy.name} - HP reduced from ${oldHPPesticide} to ${buggy.hp}, Damage: ${actualDamage}`);
+                            if (nearestEnemy.name === "Buggy") {
+                                const oldHPPesticide = nearestEnemy.hp;
+                                nearestEnemy.hp -= actualDamage;
+                                console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPPesticide} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
                                 tower.damageDealt += actualDamage;
-                                createPesticideEffect(tower, buggy);
-                            });
+                                createPesticideEffect(tower, nearestEnemy);
+                            }
                             break;
                         default:
-                            let nearestEnemy = null;
-                            let minDistance = Infinity;
-                            enemiesInRange.forEach(e => {
-                                const distance = Math.hypot((tower.x + 0.5) * tileSize - e.x * tileSize, (tower.y + 0.5) * tileSize - e.y * tileSize);
-                                if (distance < minDistance) {
-                                    nearestEnemy = e;
-                                    minDistance = distance;
-                                }
-                            });
-
-                            if (nearestEnemy) {
-                                if (tower.name === "Pellet" || tower.name === "Gatling" || tower.name === "Sniper") {
-                                    createBullet(tower, nearestEnemy);
-                                    // console.log(`Before ${tower.name} damage update: ${tower.damageDealt}`);
-                                    tower.damageDealt += tower.damage * damageMultiplier;
-                                    // console.log(`After ${tower.name} damage update: ${tower.damageDealt}`);
-                                } else if (tower.name === "Rocket") {
-                                    createRocket(tower, nearestEnemy);
-                                    // console.log(`Before ${tower.name} damage update: ${tower.damageDealt}`);
-                                    tower.damageDealt += tower.damage * damageMultiplier;
-                                    // console.log(`After ${tower.name} damage update: ${tower.damageDealt}`);
-                                }
+                            if (tower.name === "Pellet" || tower.name === "Gatling" || tower.name === "Sniper") {
+                                createBullet(tower, nearestEnemy);
+                            } else if (tower.name === "Rocket") {
+                                console.log(`Attempting to fire Rocket at (${tower.x}, ${tower.y}) - Cooldown: ${timeSinceLastFire.toFixed(2)}s of ${1 / tower.fireRate}s`);
+                                createRocket(tower, nearestEnemy);
+                                console.log(`Rocket fired from (${tower.x}, ${tower.y}) - Instance Count: ${towersOnGrid.filter(t => t.name === "Rocket").length}`);
                             }
                     }
                     
-                    if (enemy && enemy.hp <= 0) {
+                    if (nearestEnemy && nearestEnemy.hp <= 0) {
                         if (tower.name === "Aero Cannon") {
-                            killEnemy(enemy, wraithsOnField);
+                            killEnemy(nearestEnemy, wraithsOnField);
                         } else {
-                            killEnemy(enemy, enemiesOnField);
+                            killEnemy(nearestEnemy, enemiesOnField);
                         }
                     }
-                });
-
-                enemiesOnField.forEach(enemy => {
-                    if (!enemiesInRange.includes(enemy) && 
-                       (tower.name === "Freeze" || tower.name === "Gale" || tower.name === "Terra")) {
-                        enemy.speedMultiplier = 1.0;
-                        if (tower.name === "Terra") {
-                            enemy.stunned = false;
-                        }
-                        // console.log(`${enemy.name} speed reset to normal`);
-                    }
-                });
+                }
 
                 updateHUD();
             }
+        } else if (tower.name === "Rocket") {
+            // console.log(`Rocket at (${tower.x}, ${tower.y}) on cooldown - Time since last fire: ${timeSinceLastFire.toFixed(2)}s, Required: ${1 / tower.fireRate}s`);
+        }
+    });
+
+    // Global speed reset for enemies out of all Freeze/Gale/Terra ranges
+    enemiesOnField.forEach(enemy => {
+        const inFreezeRange = towersOnGrid.some(tower => 
+            tower.name === "Freeze" && 
+            Math.hypot((tower.x + 0.5) * tileSize - enemy.x * tileSize, (tower.y + 0.5) * tileSize - enemy.y * tileSize) < tower.range * tileSize
+        );
+        const inGaleRange = towersOnGrid.some(tower => 
+            tower.name === "Gale" && 
+            Math.hypot((tower.x + 0.5) * tileSize - enemy.x * tileSize, (tower.y + 0.5) * tileSize - enemy.y * tileSize) < tower.range * tileSize
+        );
+        const inTerraRange = towersOnGrid.some(tower => 
+            tower.name === "Terra" && 
+            Math.hypot((tower.x + 0.5) * tileSize - enemy.x * tileSize, (tower.y + 0.5) * tileSize - enemy.y * tileSize) < tower.range * tileSize
+        );
+
+        if (!inFreezeRange && !inGaleRange && !inTerraRange) {
+            enemy.speedMultiplier = 1.0;
+            enemy.stunned = false; // Reset stun for Terra too
+            console.log(`${enemy.name} speed reset to normal`);
         }
     });
 }
-// End of tower update function                             
+// End of tower update function                           
 
 
 
@@ -1981,40 +1979,30 @@ function updateBullets() {
 
 
 
-// Start of rocket update function
+// Start of rockets update function
 function updateRockets(deltaTime) {
     if (window.gamePaused) {
-        // console.log('updateRockets: Skipping updates because game is paused');
         return;
     }
 
-    // console.log('Updating rockets...');
-    for (let i = rockets.length - 1; i >= 0; i--) {
-        const rocket = rockets[i];
-        if (!rocket.exploded) {
-            rocket.x += Math.cos(rocket.direction) * rocket.speed * deltaTime;
-            rocket.y += Math.sin(rocket.direction) * rocket.speed * deltaTime;
-            if (rocket.checkCollision() || rocket.distanceTraveled() > rocket.tower.range * tileSize) {
-                rocket.explode();
-            }
-        } else {
-            // Only allow one explosion effect per frame/update cycle
-            if (rocket.explosionTime === 0) {
-                rocket.explode();
-            }
-            rocket.explosionTime++;
-            if (rocket.explosionTime > 10) { 
-                rockets.splice(i, 1);
-            }
+    // First, update and filter out rockets that should be removed
+    rockets = rockets.filter(rocket => {
+        const shouldRemove = rocket.update(deltaTime);
+        if (shouldRemove) {
+            // console.log(`Rocket #${rocket.rocketId} removed from rockets array`);
         }
-        if (rocket.update(deltaTime)) {
-            // Rocket has exploded or travelled out of range, remove it
-            rockets.splice(i, 1);
-        }
-    }
-}
-// End of rocket update function
+        return !shouldRemove;
+    });
 
+    // Then, draw only active rockets (those remaining after filtering)
+    rockets.forEach(rocket => {
+        rocket.draw(); // Draw only active rockets
+    });
+    
+    // Log active rockets to verify no duplicates
+    // console.log(`Active rockets after update: ${rockets.length}`);
+}
+// End of rockets update function
 
 
 // Start of light bullet update function
@@ -3189,6 +3177,7 @@ function gameLoop(timestamp) {
         }
     }
 
+    // console.log(`Game loop frame - DeltaTime: ${deltaTime.toFixed(3)}, Rockets active: ${rockets.length}`);
     requestAnimationFrame(gameLoop);
 }
 
@@ -3203,7 +3192,7 @@ function updateGameState(deltaTime) {
     updateGunAngles();
     updateInteractionFeedback();
 
-    updateRockets(deltaTime);
+    updateRockets(deltaTime); // Ensure called only once here
     updateBullets();
     updateLightBullets();
     updateSpecialEffects();
@@ -3222,11 +3211,9 @@ function updateGameState(deltaTime) {
     }
 
     if (waveDelayCountdown > 0) {
-        // console.log(`Countdown before decrement: ${waveDelayCountdown.toFixed(2)}, DeltaTime: ${deltaTime.toFixed(4)}`);
         waveDelayCountdown -= deltaTime;
         waveDelayCountdown = Math.max(0, waveDelayCountdown);
         const displayCountdown = Math.round(waveDelayCountdown * 10) / 10;
-        // console.log(`Countdown after decrement: ${waveDelayCountdown.toFixed(2)}, Display Countdown: ${displayCountdown.toFixed(2)}`);
         document.getElementById('waveDelayTimer').textContent = `${displayCountdown.toFixed(1)} seconds`;
     } else {
         document.getElementById('waveDelayTimer').textContent = '';
@@ -3254,25 +3241,25 @@ function updateGameState(deltaTime) {
 
         holes.forEach(hole => hole.update());
         if (holes.some(hole => hole.buggiesSpawned)) {
-            console.log(`Score when Buggy from hole spawned: ${enemiesKilled}, Holes active:", holes.length}`);
+            // console.log(`Score when Buggy from hole spawned: ${enemiesKilled}, Holes active: ${holes.length}`);
         }
     } else {
-        console.log("No holes active at this time.");
+        // console.log("No holes active at this time.");
     }
 
     // Removed score-based hole spawning logic here
-    // console.log("Current enemies on field:", enemiesOnField.length, "Score:", enemiesKilled);
 }
 
 function renderGame() {
     drawGrid();
     if (holes && holes.length > 0) {
         holes.forEach(hole => hole.draw());
-    } else {
-        console.log("No holes to render.");
     }
+    // Removed rockets.forEach(rocket => rocket.draw()) to prevent duplicate draws
+    // console.log(`Rendering game - Rockets active: ${rockets.length}`);
 }
 // End of game loop function
+
 
 
 // Start of Buggy from Hole Removal Function
@@ -3361,7 +3348,7 @@ class Hole {
         if (this.size <= 0) {
             let index = holes.indexOf(this);
             if (index !== -1) holes.splice(index, 1);
-            console.log("Hole at", this.x, this.y, "has completely faded away");
+            // console.log("Hole at", this.x, this.y, "has completely faded away");
         }
     }
 
@@ -3398,7 +3385,7 @@ class Hole {
         const fadeElapsed = (currentTime - this.fadeStartTime) / 1000;
         if (fadeElapsed < 5) {  
             this.size = Math.max(0, this.size - (this.maxSize / 500)); 
-            console.log("Hole fading at", this.x, this.y, "Current size:", this.size.toFixed(2));
+            // console.log("Hole fading at", this.x, this.y, "Current size:", this.size.toFixed(2));
         } else {
             this.size = 0;
         }
@@ -3409,7 +3396,7 @@ class Hole {
         if (currentTime - this.startTime >= totalTime * 1000) { // Convert to milliseconds
             if (!this.fadeStartTime) {
                 this.fadeStartTime = currentTime;
-                console.log("Auto fade-out initiated for hole at", this.x, this.y);
+                // console.log("Auto fade-out initiated for hole at", this.x, this.y);
             }
             this.fadeOut(currentTime);
         }
@@ -3447,7 +3434,7 @@ function removeBuggyFromHole(enemy) {
             let index = hole.buggiesFromHole.indexOf(enemy);
             if (index !== -1) {
                 hole.buggiesFromHole.splice(index, 1);
-                console.log("Buggy from hole removed at", hole.x, hole.y, ". Remaining:", hole.buggiesFromHole.length);
+                // console.log("Buggy from hole removed at", hole.x, hole.y, ". Remaining:", hole.buggiesFromHole.length);
             }
         });
     }
@@ -3682,7 +3669,7 @@ if (canvas) {
                     if (clickedTower) {
                         // If a placed tower is clicked, we switch to viewing mode
                         selectedTower = clickedTower;
-                        // console.log('Viewing tower:', selectedTower.name, 'at', selectedTower.x, selectedTower.y);
+                        console.log('Viewing tower:', selectedTower.name, 'at', selectedTower.x, selectedTower.y);
 
                         // Remove existing tooltips for both towers and enemies
                         const existingTooltips = document.querySelectorAll('.tower-stats-tooltip, .enemy-stats-tooltip');
@@ -3789,11 +3776,12 @@ function handleEnemyClick(e) {
 }
 
 function showEnemyStats(event, enemy) {
+    const currentSpeed = (enemy.speed * enemy.speedMultiplier).toFixed(2); // Calculate actual speed
     const statsDiv = document.createElement("div");
     statsDiv.className = 'enemy-stats-tooltip';
     statsDiv.innerHTML = `${enemy.name}
 HP: ${enemy.hp}
-Speed: ${enemy.speed.toFixed(2)}`;
+Speed: ${currentSpeed}`;
 
     document.body.appendChild(statsDiv);
 
@@ -3812,8 +3800,9 @@ Speed: ${enemy.speed.toFixed(2)}`;
         document.removeEventListener('mousemove', updateTooltipPosition);
     }, 3000);
 }
-
 // End of enemy click handler function
+
+
 
 // Start of tower click handler function
 function handleTowerClick(e) {
@@ -3964,7 +3953,7 @@ function createTowerButtons() {
 
             button.addEventListener('click', () => {
                 selectTower(tower.id);
-                // console.log(`Selected tower ${tower.name}. HP: ${tower.hp}, MaxHP: ${tower.hp}`);
+                console.log(`Selected tower ${tower.name}. HP: ${tower.hp}, MaxHP: ${tower.hp}`);
             });
             towerButtonsDiv.appendChild(button);
         });
@@ -4193,7 +4182,7 @@ function selectTower(towerIndex) {
                 towerStats.innerHTML = wallStatsHTML;
             } else {
                 let explosionRadiusField = '';
-                if (selectedTower.name === "Thunder" || selectedTower.name === "Rocket") {
+                if (selectedTower.name === "Rocket") {
                     explosionRadiusField = `
                     <div>
                         <span>Explosion Radius:</span>
@@ -5091,7 +5080,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (currentWave <= waves.length) {
                 waveActive = false;
                 currentWave++;
-                console.log("Forcing wave to inactive and spawning the next wave. New Wave:", currentWave);
+                // console.log("Forcing wave to inactive and spawning the next wave. New Wave:", currentWave);
                 spawnEnemiesForWave();
             } else {
                 console.log("No more waves to spawn.");
