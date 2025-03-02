@@ -18,7 +18,7 @@ const towers = [
     },
     { 
         name: "Pellet", 
-        fireRate: 0.7, 
+        fireRate: 1.5, 
         damage: 1, 
         range: 2, 
         cost: 30, 
@@ -29,14 +29,14 @@ const towers = [
         maxHP: 40,
         upgradeLevel: 0,
         upgrades: [
-            { fireRate: 0.7, damage: 1, range: 2 },
-            { fireRate: 0.8, damage: 2, range: 2 }, // Level 1 upgrade
-            { fireRate: 0.8, damage: 5, range: 2 }  // Level 2 upgrade
+            { fireRate: 1.5, damage: 1, range: 2 },
+            { fireRate: 1.5, damage: 2, range: 2 }, // Level 1 upgrade
+            { fireRate: 1.5, damage: 4, range: 2 }  // Level 2 upgrade
         ]
     },
     { 
         name: "Gatling", 
-        fireRate: 1.5, 
+        fireRate: 1.9, 
         damage: 1, 
         range: 2, 
         cost: 50, 
@@ -47,9 +47,9 @@ const towers = [
         maxHP: 40,
         upgradeLevel: 0,
         upgrades: [
-            { fireRate: 1.5, damage: 1, range: 2 },
-            { fireRate: 2, damage: 1, range: 2 }, // Level 1 upgrade
-            { fireRate: 3.4, damage: 2, range: 2 }  // Level 2 upgrade
+            { fireRate: 1.9, damage: 1, range: 2 },
+            { fireRate: 2.5, damage: 1, range: 3 }, // Level 1 upgrade
+            { fireRate: 2.5, damage: 2, range: 3 }  // Level 2 upgrade
         ]
     },
     { 
@@ -66,14 +66,14 @@ const towers = [
         upgradeLevel: 0,
         upgrades: [
             { fireRate: 0.2, damage: 5, range: 5 },
-            { fireRate: 0.2, damage: 6, range: 6 }, // Level 1 upgrade
-            { fireRate: 0.3, damage: 8, range: 7 }  // Level 2 upgrade
+            { fireRate: 0.4, damage: 5, range: 6 }, // Level 1 upgrade
+            { fireRate: 0.4, damage: 8, range: 7 }  // Level 2 upgrade
         ]
     },
     { 
         name: "Rocket", 
         fireRate: 0.1, 
-        damage: 5, 
+        damage: 6, 
         range: 7, 
         cost: 200, 
         color: 'indigo', 
@@ -84,15 +84,15 @@ const towers = [
         maxHP: 40,
         upgradeLevel: 0,
         upgrades: [
-            { fireRate: 0.1, damage: 5, range: 7, explosionRadius: 100 },
-            { fireRate: 0.1, damage: 10, range: 7, explosionRadius: 120 }, // Level 1 upgrade
-            { fireRate: 0.1, damage: 16, range: 8, explosionRadius: 140 }  // Level 2 upgrade
+            { fireRate: 0.1, damage: 6, range: 7, explosionRadius: 100 },
+            { fireRate: 0.1, damage: 12, range: 8, explosionRadius: 120 }, // Level 1 upgrade
+            { fireRate: 0.1, damage: 24, range: 8, explosionRadius: 140 }  // Level 2 upgrade
         ]
     },
     { 
         name: "Pesticide", 
-        fireRate: 0.5, 
-        damage: 8, 
+        fireRate: 1.8, 
+        damage: 2, 
         range: 3, 
         cost: 200, 
         color: 'limegreen', 
@@ -102,15 +102,15 @@ const towers = [
         maxHP: 40,
         upgradeLevel: 0,
         upgrades: [
-            { fireRate: 0.5, damage: 8, range: 3 },
-            { fireRate: 0.5, damage: 10, range: 4 }, // Level 1 upgrade
-            { fireRate: 0.8, damage: 10, range: 4 }  // Level 2 upgrade
+            { fireRate: 1.8, damage: 2, range: 3 },
+            { fireRate: 2.2, damage: 2, range: 4 }, // Level 1 upgrade
+            { fireRate: 2.4, damage: 3, range: 5 }  // Level 2 upgrade
         ]
     },
     { 
         name: "Aero Cannon", 
-        fireRate: 1.8, 
-        damage: 20, 
+        fireRate: 2, 
+        damage: 10, 
         range: 4, 
         cost: 200, 
         color: 'black', 
@@ -120,15 +120,15 @@ const towers = [
         maxHP: 40,
         upgradeLevel: 0,
         upgrades: [
-            { fireRate: 1.8, damage: 20, range: 4 },
-            { fireRate: 2.2, damage: 25, range: 4 }, // Level 1 upgrade
-            { fireRate: 2.4, damage: 28, range: 5 } // Level 2 upgrade
+            { fireRate: 2, damage: 10, range: 4 },
+            { fireRate: 2, damage: 20, range: 4 }, // Level 1 upgrade
+            { fireRate: 2, damage: 25, range: 6 } // Level 2 upgrade
         ]
     },
     { 
         name: "Flame", 
-        fireRate: 0.5, 
-        damage: 4, 
+        fireRate: 1.6, 
+        damage: 1, 
         range: 2, 
         cost: 250, 
         color: 'orange', 
@@ -138,16 +138,16 @@ const towers = [
         maxHP: 40,
         upgradeLevel: 0,
         upgrades: [
-            { fireRate: 0.5, damage: 4, range: 2 },
-            { fireRate: 0.5, damage: 8, range: 2 }, // Level 1 upgrade
-            { fireRate: 0.6, damage: 10, range: 3 }   // Level 2 upgrade
+            { fireRate: 1.6, damage: 1, range: 2 },
+            { fireRate: 1.6, damage: 2, range: 2 }, // Level 1 upgrade
+            { fireRate: 1.6, damage: 4, range: 2 }   // Level 2 upgrade
         ]
     },
     { 
     name: "Freeze", 
-    fireRate: 0.4, 
-    damage: 2, 
-    range: 3, 
+    fireRate: 0.7, 
+    damage: 1, 
+    range: 2, 
     cost: 250, 
     color: 'cyan', 
     id: 6, 
@@ -156,15 +156,15 @@ const towers = [
     maxHP: 40,
     upgradeLevel: 0,
     upgrades: [
-        { fireRate: 0.4, damage: 2, range: 3, slowMultiplier: 0.4 }, // 60% slow
-        { fireRate: 0.6, damage: 4, range: 2, slowMultiplier: 0.3 }, // 70% slow
-        { fireRate: 0.4, damage: 7, range: 3, slowMultiplier: 0.2 }  // 80% slow
+        { fireRate: 0.7, damage: 1, range: 2, slowMultiplier: 0.4 }, // 60% slow
+        { fireRate: 1.2, damage: 1, range: 2, slowMultiplier: 0.3 }, // 70% slow
+        { fireRate: 1.5, damage: 1, range: 2, slowMultiplier: 0.2 }  // 80% slow
     ]
 },
     { 
         name: "Aqua", 
-        fireRate: 0.3, 
-        damage: 4, 
+        fireRate: 0.5, 
+        damage: 3, 
         range: 3, 
         cost: 250, 
         color: 'deepskyblue', 
@@ -174,14 +174,14 @@ const towers = [
         maxHP: 40,
         upgradeLevel: 0,
         upgrades: [
-            { fireRate: 0.3, damage: 4, range: 3 },
-            { fireRate: 0.3, damage: 8, range: 3 }, // Level 1 upgrade
-            { fireRate: 0.4, damage: 13, range: 3 }  // Level 2 upgrade
+            { fireRate: 0.5, damage: 3, range: 3 },
+            { fireRate: 0.5, damage: 6, range: 3 }, // Level 1 upgrade
+            { fireRate: 0.5, damage: 12, range: 3 }  // Level 2 upgrade
         ]
     },
     { 
         name: "Gale", 
-        fireRate: 0.4, 
+        fireRate: 0.5, 
         damage: 2, 
         range: 3, 
         cost: 250, 
@@ -192,15 +192,15 @@ const towers = [
         maxHP: 40,
         upgradeLevel: 0,
         upgrades: [
-            { fireRate: 0.4, damage: 2, range: 3 },
+            { fireRate: 0.5, damage: 2, range: 3 },
             { fireRate: 0.5, damage: 4, range: 3 },  // Level 1 upgrade
             { fireRate: 0.5, damage: 8, range: 3 }  // Level 2 upgrade
         ]
     },
     { 
         name: "Terra", 
-        fireRate: 0.3, 
-        damage: 4, 
+        fireRate: 0.8, 
+        damage: 1, 
         range: 2, 
         cost: 250, 
         color: 'sienna', 
@@ -210,9 +210,9 @@ const towers = [
         maxHP: 40,
         upgradeLevel: 0,
         upgrades: [
-            { fireRate: 0.3, damage: 4, range: 2 },
-            { fireRate: 0.3, damage: 5, range: 3 }, // Level 1 upgrade
-            { fireRate: 0.3, damage: 8, range: 3 }   // Level 2 upgrade
+            { fireRate: 0.8, damage: 1, range: 2 },
+            { fireRate: 1.5, damage: 1, range: 2 }, // Level 1 upgrade
+            { fireRate: 1.5, damage: 2, range: 2 }   // Level 2 upgrade
         ]
     },
     { 
@@ -230,7 +230,7 @@ const towers = [
         upgrades: [
             { fireRate: 0.5, damage: 3, range: 3 },
             { fireRate: 0.5, damage: 6, range: 3 },  // Level 1 upgrade
-            { fireRate: 0.8, damage: 6, range: 3 }   // Level 2 upgrade
+            { fireRate: 1, damage: 6, range: 3 }   // Level 2 upgrade
         ]
     }
 ];
@@ -384,18 +384,18 @@ const stepTime = 1 / 60; // Assuming 60 fps for smooth animation
 
 // Start of enemy definitions
 const enemies = [
-    { name: "Pinky", speed: 0.8, hp: 80, value: 30, color: 'lightpink', element: 'Neutral' },
-    { name: "Greeny", speed: 1.1, hp: 100, value: 30, color: 'darkgreen', element: 'Neutral' },
-    { name: "Yella", speed: 1.2, hp: 120, value: 30, color: 'gold', element: 'Neutral' },
-    { name: "Berry", speed: 1.5, hp: 150, value: 30, color: 'indigo', element: 'Neutral' },
-    { name: "Smokey", speed: 1.3, hp: 200, value: 30, color: 'orange', element: 'Fire' },
-    { name: "Chilly", speed: 1.2, hp: 200, value: 30, color: 'cyan', element: 'Ice' },
-    { name: "Wetta", speed: 1.4, hp: 200, value: 30, color: 'deepskyblue', element: 'Water' },
-    { name: "Windy", speed: 1.7, hp: 200, value: 30, color: 'lightseagreen', element: 'Wind' },
-    { name: "Rocky", speed: 1, hp: 300, value: 30, color: 'sienna', element: 'Earth' },
-    { name: "Sparky", speed: 1.1, hp: 250, value: 30, color: 'yellowgreen', element: 'Electric' },
-    { name: "Wraith", speed: 1.4, hp: 150, value: 30, color: 'black', element: 'Ghost', wings: true, bodySize: tileSize / 4 },
-    { name: "Buggy", speed: 0.9, hp: 200, value: 30, color: 'orange', element: 'Bug', bodySize: tileSize / 3 }
+    { name: "Pinky", speed: 0.8, hp: 50, value: 40, color: 'lightpink', element: 'Neutral' },
+    { name: "Greeny", speed: 1, hp: 60, value: 40, color: 'darkgreen', element: 'Neutral' },
+    { name: "Yella", speed: 1.2, hp: 70, value: 40, color: 'gold', element: 'Neutral' },
+    { name: "Berry", speed: 1.4, hp: 80, value: 40, color: 'indigo', element: 'Neutral' },
+    { name: "Smokey", speed: 1.3, hp: 100, value: 50, color: 'orange', element: 'Fire' },
+    { name: "Chilly", speed: 1.1, hp: 120, value: 50, color: 'cyan', element: 'Ice' },
+    { name: "Wetta", speed: 1.3, hp: 100, value: 50, color: 'deepskyblue', element: 'Water' },
+    { name: "Windy", speed: 1.5, hp: 90, value: 50, color: 'lightseagreen', element: 'Wind' },
+    { name: "Rocky", speed: 1, hp: 180, value: 50, color: 'sienna', element: 'Earth' },
+    { name: "Sparky", speed: 1.2, hp: 120, value: 50, color: 'yellowgreen', element: 'Electric' },
+    { name: "Wraith", speed: 1.2, hp: 100, value: 50, color: 'black', element: 'Ghost', wings: true, bodySize: tileSize / 4 },
+    { name: "Buggy", speed: 0.8, hp: 60, value: 50, color: 'orange', element: 'Bug', bodySize: tileSize / 3 }
 ];
 // End of enemy definitions
 
@@ -1339,7 +1339,7 @@ class LightBullet {
             if (distance < (wraith.bodySize || 20) + this.radius) {
                 const oldHP = wraith.hp;
                 wraith.hp -= this.damage;
-                // console.log(`Wraith ${wraith.name} HP reduced from ${oldHP} to ${wraith.hp}, Damage: ${oldHP - wraith.hp}`);
+                console.log(`Wraith ${wraith.name} HP reduced from ${oldHP} to ${wraith.hp}, Damage: ${oldHP - wraith.hp}`);
                 if (typeof this.tower.damageDealt !== 'number') {
                     this.tower.damageDealt = 0;
                 }
@@ -1650,9 +1650,10 @@ function updateTowers(deltaTime) {
             if (tower.name !== "Wall" && enemiesInRange.length > 0) {
                 playTowerShootSound(tower); // Call with validated tower object
                 let damageMultiplier = 1;
+
+                // For single-target towers, select nearest enemy and define actualDamage
                 let nearestEnemy = null;
                 let minDistance = Infinity;
-
                 enemiesInRange.forEach(e => {
                     const distance = Math.hypot((tower.x + 0.5) * tileSize - e.x * tileSize, (tower.y + 0.5) * tileSize - e.y * tileSize);
                     if (distance < minDistance) {
@@ -1665,71 +1666,96 @@ function updateTowers(deltaTime) {
                     if (tower.element && nearestEnemy.element) {
                         damageMultiplier = calculateElementDamage(tower.element, nearestEnemy.element);
                     }
-
-                    let actualDamage = tower.damage * damageMultiplier;
+                    let actualDamage = tower.damage * damageMultiplier; // Define here for single-target use
 
                     switch(tower.name) {
                         case "Flame":
-                            const oldHPFlame = nearestEnemy.hp;
-                            nearestEnemy.hp -= actualDamage;
-                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPFlame} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
-                            tower.damageDealt += actualDamage;
+                            enemiesInRange.forEach(enemy => {
+                                damageMultiplier = calculateElementDamage(tower.element, enemy.element);
+                                const actualDamageAoE = tower.damage * damageMultiplier;
+                                const oldHPFlame = enemy.hp;
+                                enemy.hp -= actualDamageAoE;
+                                console.log(`${tower.name} hit ${enemy.name} - HP reduced from ${oldHPFlame} to ${enemy.hp}, Damage: ${actualDamageAoE}`);
+                                tower.damageDealt += actualDamageAoE;
+                                if (enemy.hp <= 0) {
+                                    killEnemy(enemy, enemiesOnField);
+                                }
+                            });
                             break;
                         case "Freeze":
-                            nearestEnemy.speedMultiplier = tower.upgrades[tower.upgradeLevel].slowMultiplier; // Use upgrade-specific slow
-                            const oldHPFreeze = nearestEnemy.hp;
-                            nearestEnemy.hp -= actualDamage;
-                            console.log(`${tower.name} applied freeze effect to ${nearestEnemy.name} - HP reduced from ${oldHPFreeze} to ${nearestEnemy.hp}, Damage: ${actualDamage}, Slowed to ${(1 - tower.upgrades[tower.upgradeLevel].slowMultiplier) * 100}%`);
-                            tower.damageDealt += actualDamage;
+                            enemiesInRange.forEach(enemy => {
+                                enemy.speedMultiplier = tower.upgrades[tower.upgradeLevel].slowMultiplier; // Use upgrade-specific slow
+                                damageMultiplier = calculateElementDamage(tower.element, enemy.element);
+                                const actualDamageAoE = tower.damage * damageMultiplier;
+                                const oldHPFreeze = enemy.hp;
+                                enemy.hp -= actualDamageAoE;
+                                console.log(`${tower.name} applied freeze effect to ${enemy.name} - HP reduced from ${oldHPFreeze} to ${enemy.hp}, Damage: ${actualDamageAoE}, Slowed to ${(1 - tower.upgrades[tower.upgradeLevel].slowMultiplier) * 100}%`);
+                                tower.damageDealt += actualDamageAoE;
+                                if (enemy.hp <= 0) {
+                                    killEnemy(enemy, enemiesOnField);
+                                }
+                            });
                             break;
                         case "Aqua":
-                            let damageMultiplierAqua = calculateElementDamage(tower.element, nearestEnemy.element);
-                            const damageDealtAqua = tower.damage * damageMultiplierAqua;
                             const oldHPAqua = nearestEnemy.hp;
-                            nearestEnemy.hp -= damageDealtAqua;
-                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPAqua} to ${nearestEnemy.hp}, Damage: ${damageDealtAqua}`);
-                            tower.damageDealt += damageDealtAqua;
+                            nearestEnemy.hp -= actualDamage;
+                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPAqua} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
+                            tower.damageDealt += actualDamage;
                             createAquaStreamEffect(tower, nearestEnemy);
+                            if (nearestEnemy.hp <= 0) {
+                                killEnemy(nearestEnemy, enemiesOnField);
+                            }
                             break;
                         case "Gale":
                             nearestEnemy.speedMultiplier = 0.8;
-                            let damageMultiplierGale = calculateElementDamage(tower.element, nearestEnemy.element);
-                            const damageDealtGale = tower.damage * damageMultiplierGale;
                             const oldHPGale = nearestEnemy.hp;
-                            nearestEnemy.hp -= damageDealtGale;
-                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPGale} to ${nearestEnemy.hp}, Damage: ${damageDealtGale}`);
-                            tower.damageDealt += damageDealtGale;
+                            nearestEnemy.hp -= actualDamage;
+                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPGale} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
+                            tower.damageDealt += actualDamage;
                             createWindBladeEffect(tower, nearestEnemy);
+                            if (nearestEnemy.hp <= 0) {
+                                killEnemy(nearestEnemy, enemiesOnField);
+                            }
                             break;
                         case "Terra":
-                            nearestEnemy.stunned = true;
-                            let damageMultiplierTerra = calculateElementDamage(tower.element, nearestEnemy.element);
-                            const damageDealtTerra = tower.damage * damageMultiplierTerra;
-                            const oldHPTerra = nearestEnemy.hp;
-                            nearestEnemy.hp -= damageDealtTerra;
-                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPTerra} to ${nearestEnemy.hp}, Damage: ${damageDealtTerra}`);
-                            tower.damageDealt += damageDealtTerra;
-                            drawEarthquakeEffect(tower);
+                            enemiesInRange.forEach(enemy => {
+                                enemy.stunned = true;
+                                damageMultiplier = calculateElementDamage(tower.element, enemy.element);
+                                const actualDamageAoE = tower.damage * damageMultiplier;
+                                const oldHPTerra = enemy.hp;
+                                enemy.hp -= actualDamageAoE;
+                                enemy.speedMultiplier = Math.max(0.5, enemy.speedMultiplier - 0.05); // Integrate Earthquake slow
+                                console.log(`${tower.name} hit ${enemy.name} - HP reduced from ${oldHPTerra} to ${enemy.hp}, Damage: ${actualDamageAoE}, Stunned and slowed`);
+                                tower.damageDealt += actualDamageAoE;
+                                if (enemy.hp <= 0) {
+                                    killEnemy(enemy, enemiesOnField);
+                                }
+                            });
+                            drawEarthquakeEffect(tower); // Still draw the visual effect
                             break;
                         case "Thunder":
-                            let damageMultiplierThunder = calculateElementDamage(tower.element, nearestEnemy.element);
-                            const damageDealtThunder = tower.damage * damageMultiplierThunder;
                             const oldHPThunder = nearestEnemy.hp;
-                            nearestEnemy.hp -= damageDealtThunder;
-                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPThunder} to ${nearestEnemy.hp}, Damage: ${damageDealtThunder}`);
-                            tower.damageDealt += damageDealtThunder;
+                            nearestEnemy.hp -= actualDamage;
+                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPThunder} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
+                            tower.damageDealt += actualDamage;
                             createLightningEffect(tower, nearestEnemy);
+                            if (nearestEnemy.hp <= 0) {
+                                killEnemy(nearestEnemy, enemiesOnField);
+                            }
                             break;
                         case "Aero Cannon":
-                            createLightBullet(tower, nearestEnemy);
+                            createLightBullet(tower, nearestEnemy); // Use nearestEnemy for wraiths
                             break;
                         case "Pesticide":
                             if (nearestEnemy.name === "Buggy") {
                                 const oldHPPesticide = nearestEnemy.hp;
-                                nearestEnemy.hp -= actualDamage;
+                                nearestEnemy.hp -= actualDamage; // Now defined above
                                 console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPPesticide} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
                                 tower.damageDealt += actualDamage;
                                 createPesticideEffect(tower, nearestEnemy);
+                                if (nearestEnemy.hp <= 0) {
+                                    killEnemy(nearestEnemy, enemiesOnField);
+                                }
                             }
                             break;
                         default:
@@ -1740,14 +1766,6 @@ function updateTowers(deltaTime) {
                                 createRocket(tower, nearestEnemy);
                                 console.log(`Rocket fired from (${tower.x}, ${tower.y}) - Instance Count: ${towersOnGrid.filter(t => t.name === "Rocket").length}`);
                             }
-                    }
-                    
-                    if (nearestEnemy && nearestEnemy.hp <= 0) {
-                        if (tower.name === "Aero Cannon") {
-                            killEnemy(nearestEnemy, wraithsOnField);
-                        } else {
-                            killEnemy(nearestEnemy, enemiesOnField);
-                        }
                     }
                 }
 
@@ -1776,11 +1794,11 @@ function updateTowers(deltaTime) {
         if (!inFreezeRange && !inGaleRange && !inTerraRange) {
             enemy.speedMultiplier = 1.0;
             enemy.stunned = false; // Reset stun for Terra too
-            console.log(`${enemy.name} speed reset to normal`);
+            // console.log(`${enemy.name} speed reset to normal`);
         }
     });
 }
-// End of tower update function                           
+// End of tower update function                          
 
 
 

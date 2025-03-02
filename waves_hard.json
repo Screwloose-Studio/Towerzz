@@ -8,7 +8,7 @@
       }
     ],
     "hpMultiplier": 0.3,
-    "speedMultiplier": 0.8,
+    "speedMultiplier": 0.9,
     "wave_delay": 15000
   },
   {
@@ -20,7 +20,7 @@
       }
     ],
     "hpMultiplier": 0.3,
-    "speedMultiplier": 0.8,
+    "speedMultiplier": 0.9,
     "wave_delay": 15000
   },
   {
@@ -31,7 +31,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 0.4,
+    "hpMultiplier": 0.3,
     "speedMultiplier": 0.9,
     "wave_delay": 15000
   },
@@ -43,7 +43,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 0.5,
+    "hpMultiplier": 0.4,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -59,7 +59,7 @@
         "count": 6
       }
     ],
-    "hpMultiplier": 0.5,
+    "hpMultiplier": 0.4,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -75,7 +75,7 @@
         "count": 8
       }
     ],
-    "hpMultiplier": 0.5,
+    "hpMultiplier": 0.4,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -91,7 +91,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 0.7,
+    "hpMultiplier": 0.5,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -111,7 +111,7 @@
         "count": 6
       }
     ],
-    "hpMultiplier": 0.7,
+    "hpMultiplier": 0.5,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -135,7 +135,7 @@
         "count": 6
       }
     ],
-    "hpMultiplier": 0.7,
+    "hpMultiplier": 0.6,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -155,7 +155,7 @@
         "count": 8
       }
     ],
-    "hpMultiplier": 0.7,
+    "hpMultiplier": 0.6,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -169,17 +169,15 @@
       {
         "type": 5,
         "count": 10
+      },
+      {
+        "type": 0,
+        "count": 6
       }
     ],
-    "hpMultiplier": 0.8,
+    "hpMultiplier": 0.7,
     "speedMultiplier": 1,
-    "wave_delay": 15000,
-    "hole": {
-      "spawn": true,
-      "buggyCount": 4,
-      "hpMultiplier": 0.8,
-      "speedMultiplier": 1
-    }
+    "wave_delay": 15000
   },
   {
     "wave": 12,
@@ -193,7 +191,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 0.8,
+    "hpMultiplier": 0.7,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -209,7 +207,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 0.9,
+    "hpMultiplier": 0.8,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -225,7 +223,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 0.9,
+    "hpMultiplier": 0.8,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -239,17 +237,15 @@
       {
         "type": 1,
         "count": 8
+      },
+      {
+        "type": 0,
+        "count": 10
       }
     ],
-    "hpMultiplier": 0.9,
+    "hpMultiplier": 0.8,
     "speedMultiplier": 1,
-    "wave_delay": 15000,
-    "hole": {
-      "spawn": true,
-      "buggyCount": 2,
-      "hpMultiplier": 0.9,
-      "speedMultiplier": 1
-    }
+    "wave_delay": 15000
   },
   {
     "wave": 16,
@@ -269,17 +265,15 @@
       {
         "type": 10,
         "count": 4
+      },
+      {
+        "type": 0,
+        "count": 8
       }
     ],
     "hpMultiplier": 0.5,
     "speedMultiplier": 1,
-    "wave_delay": 15000,
-    "hole": {
-      "spawn": true,
-      "buggyCount": 5,
-      "hpMultiplier": 0.5,
-      "speedMultiplier": 1
-    }
+    "wave_delay": 15000
   },
   {
     "wave": 18,
@@ -293,8 +287,8 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1,
-    "speedMultiplier": 1.1,
+    "hpMultiplier": 0.9,
+    "speedMultiplier": 1,
     "wave_delay": 15000
   },
   {
@@ -309,8 +303,8 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1,
-    "speedMultiplier": 1.1,
+    "hpMultiplier": 0.9,
+    "speedMultiplier": 1,
     "wave_delay": 15000
   },
   {
@@ -326,13 +320,13 @@
       }
     ],
     "hpMultiplier": 1,
-    "speedMultiplier": 1.1,
+    "speedMultiplier": 1,
     "wave_delay": 15000,
     "hole": {
       "spawn": true,
       "buggyCount": 4,
       "hpMultiplier": 1,
-      "speedMultiplier": 1.1
+      "speedMultiplier": 1
     }
   },
   {
@@ -348,7 +342,7 @@
       }
     ],
     "hpMultiplier": 1,
-    "speedMultiplier": 1.1,
+    "speedMultiplier": 1,
     "wave_delay": 15000
   },
   {
@@ -364,7 +358,7 @@
       }
     ],
     "hpMultiplier": 1,
-    "speedMultiplier": 1.1,
+    "speedMultiplier": 1,
     "wave_delay": 15000
   },
   {
@@ -403,7 +397,7 @@
         "count": 12
       }
     ],
-    "hpMultiplier": 1.2,
+    "hpMultiplier": 1,
     "speedMultiplier": 1.3,
     "wave_delay": 15000
   },
@@ -435,7 +429,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.2,
+    "hpMultiplier": 1,
     "speedMultiplier": 1.3,
     "wave_delay": 15000
   },
@@ -481,7 +475,7 @@
         "count": 12
       }
     ],
-    "hpMultiplier": 1.5,
+    "hpMultiplier": 1,
     "speedMultiplier": 1.4,
     "wave_delay": 15000
   },
@@ -513,7 +507,7 @@
         "count": 12
       }
     ],
-    "hpMultiplier": 1.5,
+    "hpMultiplier": 1.1,
     "speedMultiplier": 1.4,
     "wave_delay": 15000
   },
@@ -529,13 +523,13 @@
         "count": 8
       }
     ],
-    "hpMultiplier": 1.2,
+    "hpMultiplier": 1,
     "speedMultiplier": 1,
     "wave_delay": 15000,
     "hole": {
       "spawn": true,
       "buggyCount": 6,
-      "hpMultiplier": 1.2,
+      "hpMultiplier": 1,
       "speedMultiplier": 1
     }
   },
@@ -559,7 +553,7 @@
         "count": 16
       }
     ],
-    "hpMultiplier": 2,
+    "hpMultiplier": 1.2,
     "speedMultiplier": 1.5,
     "wave_delay": 15000
   },
@@ -591,7 +585,7 @@
         "count": 16
       }
     ],
-    "hpMultiplier": 2.2,
+    "hpMultiplier": 1.2,
     "speedMultiplier": 1.6,
     "wave_delay": 15000
   },
@@ -607,13 +601,13 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 2,
+    "hpMultiplier": 1.2,
     "speedMultiplier": 1.1,
     "wave_delay": 15000,
     "hole": {
       "spawn": true,
       "buggyCount": 4,
-      "hpMultiplier": 2,
+      "hpMultiplier": 1.2,
       "speedMultiplier": 1.1
     }
   },
@@ -637,13 +631,13 @@
         "count": 16
       }
     ],
-    "hpMultiplier": 3,
+    "hpMultiplier": 1.4,
     "speedMultiplier": 1.6,
     "wave_delay": 15000,
     "hole": {
       "spawn": true,
       "buggyCount": 4,
-      "hpMultiplier": 3,
+      "hpMultiplier": 1.4,
       "speedMultiplier": 1.6
     }
   },
@@ -675,7 +669,7 @@
         "count": 16
       }
     ],
-    "hpMultiplier": 3,
+    "hpMultiplier": 1.4,
     "speedMultiplier": 1.6,
     "wave_delay": 15000
   },
@@ -691,13 +685,13 @@
         "count": 12
       }
     ],
-    "hpMultiplier": 1.8,
+    "hpMultiplier": 1.1,
     "speedMultiplier": 1.2,
     "wave_delay": 15000,
     "hole": {
       "spawn": true,
       "buggyCount": 8,
-      "hpMultiplier": 1.8,
+      "hpMultiplier": 1.1,
       "speedMultiplier": 1.2
     }
   },
@@ -717,7 +711,7 @@
         "count": 16
       }
     ],
-    "hpMultiplier": 3,
+    "hpMultiplier": 1.4,
     "speedMultiplier": 1.6,
     "wave_delay": 15000
   },
@@ -737,13 +731,13 @@
         "count": 16
       }
     ],
-    "hpMultiplier": 3,
+    "hpMultiplier": 1.5,
     "speedMultiplier": 1.6,
     "wave_delay": 15000,
     "hole": {
       "spawn": true,
       "buggyCount": 4,
-      "hpMultiplier": 3,
+      "hpMultiplier": 1.5,
       "speedMultiplier": 1.6
     }
   },
@@ -763,7 +757,7 @@
         "count": 16
       }
     ],
-    "hpMultiplier": 3.2,
+    "hpMultiplier": 1.5,
     "speedMultiplier": 1.6,
     "wave_delay": 15000
   },
@@ -783,7 +777,7 @@
         "count": 12
       }
     ],
-    "hpMultiplier": 2,
+    "hpMultiplier": 1.3,
     "speedMultiplier": 1.1,
     "wave_delay": 15000
   },
@@ -803,13 +797,13 @@
         "count": 16
       }
     ],
-    "hpMultiplier": 4.1,
+    "hpMultiplier": 1.8,
     "speedMultiplier": 1.6,
     "wave_delay": 15000,
     "hole": {
       "spawn": true,
       "buggyCount": 2,
-      "hpMultiplier": 4.1,
+      "hpMultiplier": 1.8,
       "speedMultiplier": 1.6
     }
   },
@@ -829,7 +823,7 @@
         "count": 16
       }
     ],
-    "hpMultiplier": 4.2,
+    "hpMultiplier": 1.9,
     "speedMultiplier": 1.6,
     "wave_delay": 15000
   },
@@ -849,7 +843,7 @@
         "count": 16
       }
     ],
-    "hpMultiplier": 4.2,
+    "hpMultiplier": 2,
     "speedMultiplier": 1.6,
     "wave_delay": 15000
   },
@@ -869,7 +863,7 @@
         "count": 12
       }
     ],
-    "hpMultiplier": 2.4,
+    "hpMultiplier": 1.5,
     "speedMultiplier": 1.2,
     "wave_delay": 15000
   },
@@ -889,13 +883,13 @@
         "count": 16
       }
     ],
-    "hpMultiplier": 4.1,
+    "hpMultiplier": 2,
     "speedMultiplier": 1.7,
     "wave_delay": 15000,
     "hole": {
       "spawn": true,
       "buggyCount": 6,
-      "hpMultiplier": 4.1,
+      "hpMultiplier": 2,
       "speedMultiplier": 1.7
     }
   },
