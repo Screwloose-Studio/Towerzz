@@ -3648,7 +3648,7 @@ if (canvas) {
             const clickY = Math.floor((event.clientY - rect.top) * scaleY / tileSize);
 
             if (clickX >= 0 && clickX < gridWidth && clickY >= 0 && clickY < gridHeight) {
-                // Check for enemy click first, as we want to prioritize this over placing towers
+                // Check for enemy click first
                 if (handleEnemyClick(event)) {
                     cancelUpgradeMode(); // Cancel upgrade mode if an enemy is clicked
                     return;
@@ -3685,18 +3685,9 @@ if (canvas) {
                 } else {
                     const clickedTower = towersOnGrid.find(tower => tower.x === clickX && tower.y === clickY);
                     if (clickedTower) {
-                        // If a placed tower is clicked, we switch to viewing mode
-                        selectedTower = clickedTower;
-                        console.log('Viewing tower:', selectedTower.name, 'at', selectedTower.x, selectedTower.y);
-
-                        // Remove existing tooltips for both towers and enemies
-                        const existingTooltips = document.querySelectorAll('.tower-stats-tooltip, .enemy-stats-tooltip');
-                        existingTooltips.forEach(tooltip => tooltip.remove());
-
-                        handleTowerClick(event); // Show tower tooltip
-                        drawGrid(); // Update to show the range ring for the selected tower
+                        // If a placed tower is clicked, show stats and switch selection
+                        handleTowerClick(event); // This will now also highlight the correct button
                     } else if (selectedTower && selectedTower.hasOwnProperty('id')) { // Placement mode
-                        // If no tower is at the click location and a tower is selected for placement
                         if (!towersOnGrid.some(t => t.x === clickX && t.y === clickY)) {
                             const originalTowers = towersOnGrid.slice();
 
@@ -3728,7 +3719,7 @@ if (canvas) {
                                     updatePaths();
                                 } else {
                                     towersOnGrid.pop();
-                                    showInsufficientGoldFeedback(); // Updated to show tooltip
+                                    showInsufficientGoldFeedback();
                                 }
                             } else {
                                 showBlockingFeedback();
@@ -3736,23 +3727,23 @@ if (canvas) {
                             }
                         }
                     } else {
-                        // If no tower is selected for placement and no tower is clicked, clear selection
                         selectedTower = null;
-                        // console.log('No tower selected, clearing selection');
+                        console.log('No tower selected, clearing selection');
                         drawGrid(); // Clear any range ring if no tower is selected
                     }
                 }
             } else {
-                // Clicking outside the grid cancels upgrade mode and clears selection
+                // Clicking outside the grid cancels all modes and clears selection
                 selectedTower = null;
                 removeMode = false;
+                placingTower = false;
+                cancelUpgradeMode();
                 document.querySelectorAll('.tower-button').forEach(btn => btn.classList.remove('active'));
                 const removeButton = document.getElementById('removeTowerBtn');
                 if (removeButton) {
                     removeButton.classList.remove('active');
                 }
-                cancelUpgradeMode(); // Cancel upgrade mode if clicking outside grid
-                console.log('Clicked outside grid, clearing all selections');
+                console.log('Clicked outside grid, clearing all selections and modes');
                 drawGrid(); // Redraw to remove any radius
             }
         });
@@ -3839,11 +3830,20 @@ function handleTowerClick(e) {
             existingTooltip.remove();
         }
 
+        // Select the tower type and highlight its button
+        selectTower(clickedTower.id, true); // Pass true to indicate grid click for highlighting
         showTowerStats(e, clickedTower);
     } else {
-        // If no tower is clicked, clear the selection (hide range ring)
+        // If no tower is clicked, clear the selection (hide range ring) and cancel modes
         selectedTower = null;
-        drawGrid();  // Redraw to remove the range ring
+        removeMode = false;
+        document.querySelectorAll('.tower-button').forEach(btn => btn.classList.remove('active'));
+        const removeButton = document.getElementById('removeTowerBtn');
+        if (removeButton) {
+            removeButton.classList.remove('active');
+        }
+        console.log('Clicked outside tower, clearing all selections and modes');
+        drawGrid(); // Redraw to remove any radius
     }
 }
 
@@ -3890,11 +3890,10 @@ function showTowerStats(event, tower) {
         document.removeEventListener('mousemove', updateTooltipPosition);
     }, tooltipDuration);
 
-    selectedTower = tower;
-    drawGrid();
+    selectedTower = tower; // Ensure selectedTower is set to the clicked tower instance for placement/upgrade
+    drawGrid(); // Redraw to show the range ring for the selected tower
 }
 // End of tower click handler function
-
 
 
 // Start of tower buttons creation function
@@ -3907,6 +3906,7 @@ function createTowerButtons() {
         towers.forEach((tower, index) => {
             const button = document.createElement('button');
             button.className = 'tower-button';
+            button.dataset.towerId = tower.id; // Add data-tower-id for targeting
 
             // Create and append elements manually
             const towerIcon = document.createElement('canvas');
@@ -3970,8 +3970,8 @@ function createTowerButtons() {
             }
 
             button.addEventListener('click', () => {
-                selectTower(tower.id);
-                console.log(`Selected tower ${tower.name}. HP: ${tower.hp}, MaxHP: ${tower.hp}`);
+                selectTower(tower.id, false); // Pass false to indicate button click
+                console.log(`Selected tower ${tower.name} from button click`);
             });
             towerButtonsDiv.appendChild(button);
         });
@@ -4154,7 +4154,7 @@ function drawTowerWithTurret(ctx, tower) {
 
 
 // Start of tower selection function
-function selectTower(towerIndex) {
+function selectTower(towerIndex, fromGridClick = false) {
     const towerStats = document.getElementById("towerStats");
     const removeTowerBtn = document.getElementById("removeTowerBtn");
 
@@ -4163,142 +4163,291 @@ function selectTower(towerIndex) {
         return;
     }
 
+    // Clear all active states
     document.querySelectorAll('.tower-button').forEach(btn => btn.classList.remove('active'));
     removeTowerBtn.classList.remove('active');
 
     if (towerIndex === null) { 
         removeMode = true;
         selectedTower = null;
+        placingTower = false; // Ensure we’re not in placement mode
         towerStats.innerHTML = "Remove Mode";
         removeTowerBtn.classList.add('active');
+        console.log('Switched to remove mode');
     } else {
         removeMode = false;
+        placingTower = !fromGridClick; // Only enable placement mode if clicked from button, not grid
         const correctIndex = getTowerIndexById(towerIndex);
         selectedTower = towers[correctIndex];
         
-        let towerButton = document.querySelector(`.tower-button:nth-child(${correctIndex + 1})`);
+        let towerButton = document.querySelector(`.tower-button[data-tower-id="${towerIndex}"]`);
         if (towerButton) {
             towerButton.classList.add('active');
+            console.log(`Selected tower ${selectedTower.name} from ${fromGridClick ? 'grid click' : 'button click'}`);
+
+            // Determine strong and weak against for element info
+            let strongAgainst = getStrongAgainst(selectedTower.element);
+            let weakAgainst = getWeakAgainst(selectedTower.element);
+
+            // Determine tower type
+            let towerType = '';
             if (selectedTower.name === "Wall") {
-                let wallStatsHTML = `
-                    ${selectedTower.name}
-
-                    Function: Blocks enemy path
-
-                    Price: <input type="number" value="${selectedTower.cost}" onchange="updateTower(${correctIndex}, 'cost', this.value)" ${devMode ? '' : 'disabled'}>
-
-                    Upgrades:
-                    <div>
-                        <span>HP:</span>
-                        <input type="number" value="${selectedTower.upgrades[0].hp}" onchange="updateTower(${correctIndex}, 'hp', this.value)" ${devMode ? '' : 'disabled'}>
-                        <input type="number" value="${selectedTower.upgrades[1].hp}" ${devMode ? '' : 'disabled'}>
-                        <input type="number" value="${selectedTower.upgrades[2].hp}" ${devMode ? '' : 'disabled'}>
-                    </div>
-
-                    <button id="upgradeButton" class="button upgrade-button" onclick="highlightUpgradeableTowers('${selectedTower.name}')">Upgrade</button>
-                `;
-                towerStats.innerHTML = wallStatsHTML;
+                towerType = "Defensive Barrier";
+            } else if (["Flame", "Freeze", "Terra"].includes(selectedTower.name)) {
+                towerType = "Area Attack";
             } else {
-                let explosionRadiusField = '';
-                if (selectedTower.name === "Rocket") {
-                    explosionRadiusField = `
-                    <div>
-                        <span>Explosion Radius:</span>
-                        <input type="number" value="${selectedTower.upgrades[0].explosionRadius || 0}" onchange="updateTower(${correctIndex}, 'explosionRadius', this.value)" ${devMode ? '' : 'disabled'}>
-                        <input type="number" value="${selectedTower.upgrades[1].explosionRadius || 0}" onchange="updateTower(${correctIndex}, 'upgradeLevel1explosionRadius', this.value)" ${devMode ? '' : 'disabled'}>
-                        <input type="number" value="${selectedTower.upgrades[2].explosionRadius || 0}" onchange="updateTower(${correctIndex}, 'upgradeLevel2explosionRadius', this.value)" ${devMode ? '' : 'disabled'}>
-                    </div>
+                towerType = "Single Enemy Attack";
+            }
+
+            if (devMode) {
+                // Dev Mode: Keep input boxes for editing stats (unchanged)
+                if (selectedTower.name === "Wall") {
+                    let wallStatsHTML = `
+                        ${selectedTower.name}
+
+                        Function: Blocks enemy path
+
+                        Price: <input type="number" value="${selectedTower.cost}" onchange="updateTower(${correctIndex}, 'cost', this.value)">
+
+                        Upgrades:
+                        <div>
+                            <span>HP:</span>
+                            <input type="number" value="${selectedTower.upgrades[0].hp}" onchange="updateTower(${correctIndex}, 'hp', this.value)">
+                            <input type="number" value="${selectedTower.upgrades[1].hp}">
+                            <input type="number" value="${selectedTower.upgrades[2].hp}">
+                        </div>
+
+                        <button id="upgradeButton" class="button upgrade-button" onclick="highlightUpgradeableTowers('${selectedTower.name}')">Upgrade</button>
                     `;
+                    towerStats.innerHTML = wallStatsHTML;
+                } else {
+                    let explosionRadiusField = '';
+                    if (selectedTower.name === "Rocket") {
+                        explosionRadiusField = `
+                        <div>
+                            <span>Explosion Radius:</span>
+                            <input type="number" value="${selectedTower.upgrades[0].explosionRadius || 0}" onchange="updateTower(${correctIndex}, 'explosionRadius', this.value)">
+                            <input type="number" value="${selectedTower.upgrades[1].explosionRadius || 0}" onchange="updateTower(${correctIndex}, 'upgradeLevel1explosionRadius', this.value)">
+                            <input type="number" value="${selectedTower.upgrades[2].explosionRadius || 0}" onchange="updateTower(${correctIndex}, 'upgradeLevel2explosionRadius', this.value)">
+                        </div>
+                        `;
+                    }
+
+                    let statsHTML = `
+                        <div class="tower-name">${selectedTower.name}</div>
+                        <div>
+                            <span>Fire Rate:</span>
+                            <input type="number" value="${selectedTower.fireRate}" onchange="updateTower(${correctIndex}, 'fireRate', this.value)" step="0.1" min="0.1">
+                            <input type="number" value="${selectedTower.upgrades[1].fireRate}" onchange="updateTower(${correctIndex}, 'upgradeLevel1fireRate', this.value)" step="0.1" min="0.1">
+                            <input type="number" value="${selectedTower.upgrades[2].fireRate}" onchange="updateTower(${correctIndex}, 'upgradeLevel2fireRate', this.value)" step="0.1" min="0.1">
+                        </div>
+                        <div>
+                            <span>Damage:</span>
+                            <input type="number" value="${selectedTower.damage}" onchange="updateTower(${correctIndex}, 'damage', this.value)">
+                            <input type="number" value="${selectedTower.upgrades[1].damage}" onchange="updateTower(${correctIndex}, 'upgradeLevel1damage', this.value)">
+                            <input type="number" value="${selectedTower.upgrades[2].damage}" onchange="updateTower(${correctIndex}, 'upgradeLevel2damage', this.value)">
+                        </div>
+                        <div>
+                            <span>Range:</span>
+                            <input type="number" value="${selectedTower.range}" onchange="updateTower(${correctIndex}, 'range', this.value)">
+                            <input type="number" value="${selectedTower.upgrades[1].range}" onchange="updateTower(${correctIndex}, 'upgradeLevel1range', this.value)">
+                            <input type="number" value="${selectedTower.upgrades[2].range}" onchange="updateTower(${correctIndex}, 'upgradeLevel2range', this.value)">
+                        </div>
+                        <div>
+                            <span>Price:</span>
+                            <input type="number" value="${selectedTower.cost}" onchange="updateTower(${correctIndex}, 'cost', this.value)">
+                            <input type="number" value="${selectedTower.upgrades[0].cost || selectedTower.cost}" onchange="updateTower(${correctIndex}, 'upgradeCost1', this.value)">
+                            <input type="number" value="${selectedTower.upgrades[1].cost || selectedTower.cost * 2}" onchange="updateTower(${correctIndex}, 'upgradeCost2', this.value)">
+                        </div>
+                        ${explosionRadiusField}
+                        <div>
+                            <span>Element: ${selectedTower.element}</span>
+                        </div>
+                        <div>
+                            <span>Elemental Interaction:</span><br>
+                            <span>- Strong Against: ${strongAgainst}</span><br>
+                            <span>- Weak Against: ${weakAgainst}</span>
+                        </div>
+                        <button id="upgradeButton" class="button upgrade-button" onclick="highlightUpgradeableTowers('${selectedTower.name}')">Upgrade</button>
+                    `;
+                    towerStats.innerHTML = statsHTML;
+                }
+            } else {
+                // Normal Mode: Detailed description with specific upgrade effects
+                let upgradeDetails = '';
+                let additionalDetails = '';
+
+                // Define upgrade effects based on tower data
+                switch (selectedTower.name) {
+                    case "Wall":
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases health.<br>
+                            - Level 2: Further increases health.
+                        `;
+                        break;
+                    case "Pellet":
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases damage.<br>
+                            - Level 2: Further increases damage.
+                        `;
+                        break;
+                    case "Gatling":
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases fire rate and range.<br>
+                            - Level 2: Increases damage.
+                        `;
+                        break;
+                    case "Sniper":
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases fire rate and range.<br>
+                            - Level 2: Increases damage and range.
+                        `;
+                        break;
+                    case "Rocket":
+                        additionalDetails = `
+                            <strong>Special Effect:</strong><br>
+                            - Explodes on impact, damaging multiple enemies.
+                        `;
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases damage and range, expands explosion radius.<br>
+                            - Level 2: Further increases damage and explosion radius.
+                        `;
+                        break;
+                    case "Pesticide":
+                        additionalDetails = `
+                            <strong>Special Effect:</strong><br>
+                            - Targets Buggy enemies specifically.
+                        `;
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases fire rate and range.<br>
+                            - Level 2: Increases damage and range.
+                        `;
+                        break;
+                    case "Aero Cannon":
+                        additionalDetails = `
+                            <strong>Special Effect:</strong><br>
+                            - Targets Wraith enemies specifically.
+                        `;
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases damage.<br>
+                            - Level 2: Increases damage and range.
+                        `;
+                        break;
+                    case "Flame":
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases damage to all enemies in range.<br>
+                            - Level 2: Further increases damage to all enemies in range.
+                        `;
+                        break;
+                    case "Freeze":
+                        additionalDetails = `
+                            <strong>Special Effect:</strong><br>
+                            - Slows enemies in range with increasing effectiveness.
+                        `;
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases fire rate and enhances slowing effect.<br>
+                            - Level 2: Further increases fire rate and slowing effect.
+                        `;
+                        break;
+                    case "Aqua":
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases damage.<br>
+                            - Level 2: Further increases damage.
+                        `;
+                        break;
+                    case "Gale":
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases damage.<br>
+                            - Level 2: Further increases damage.
+                        `;
+                        break;
+                    case "Terra":
+                        additionalDetails = `
+                            <strong>Special Effect:</strong><br>
+                            - Stuns enemies in range.
+                        `;
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases fire rate.<br>
+                            - Level 2: Increases damage.
+                        `;
+                        break;
+                    case "Thunder":
+                        upgradeDetails = `
+                            <strong>Upgrade Details:</strong><br>
+                            - Level 1: Increases damage.<br>
+                            - Level 2: Increases fire rate.
+                        `;
+                        break;
                 }
 
-                let strongAgainst = '';
-                let weakAgainst = '';
+                // Upgrade costs
+                const upgradeCost1 = selectedTower.upgrades[0].cost || selectedTower.cost;
+                const upgradeCost2 = selectedTower.upgrades[1].cost || selectedTower.cost * 2;
 
-                switch(selectedTower.element) {
-                    case 'Neutral':
-                        strongAgainst = 'None';
-                        weakAgainst = 'Ghost, Bug';
-                        break;
-                    case 'Fire':
-                        strongAgainst = 'Ice';
-                        weakAgainst = 'Fire, Ghost, Bug';
-                        break;
-                    case 'Ice':
-                        strongAgainst = 'Water';
-                        weakAgainst = 'Ice, Ghost, Bug';
-                        break;
-                    case 'Water':
-                        strongAgainst = 'Fire';
-                        weakAgainst = 'Water, Ghost, Bug';
-                        break;
-                    case 'Wind':
-                        strongAgainst = 'Earth';
-                        weakAgainst = 'Wind, Ghost, Bug';
-                        break;
-                    case 'Earth':
-                        strongAgainst = 'Electric';
-                        weakAgainst = 'Earth, Ghost, Bug';
-                        break;
-                    case 'Electric':
-                        strongAgainst = 'Wind';
-                        weakAgainst = 'Electric, Ghost, Bug';
-                        break;
-                    case 'Light':
-                        strongAgainst = 'Ghost';
-                        weakAgainst = 'All others';
-                        break;
-                    case 'Chemical':
-                        strongAgainst = 'Bug';
-                        weakAgainst = 'All others';
-                        break;
-                }
-
-                let statsHTML = `
-                    <div class="tower-name">${selectedTower.name}</div>
+                let descriptionHTML = `
+                    <div class="tower-name" style="font-size: 20px; font-weight: bold;">${selectedTower.name}</div>
                     <div>
-                        <span>Fire Rate:</span>
-                        <input type="number" value="${selectedTower.fireRate}" onchange="updateTower(${correctIndex}, 'fireRate', this.value)" ${devMode ? '' : 'disabled'} step="0.1" min="0.1">
-                        <input type="number" value="${selectedTower.upgrades[1].fireRate}" onchange="updateTower(${correctIndex}, 'upgradeLevel1fireRate', this.value)" ${devMode ? '' : 'disabled'} step="0.1" min="0.1">
-                        <input type="number" value="${selectedTower.upgrades[2].fireRate}" onchange="updateTower(${correctIndex}, 'upgradeLevel2fireRate', this.value)" ${devMode ? '' : 'disabled'} step="0.1" min="0.1">
+                        <strong>Type:</strong> ${towerType}
                     </div>
                     <div>
-                        <span>Damage:</span>
-                        <input type="number" value="${selectedTower.damage}" onchange="updateTower(${correctIndex}, 'damage', this.value)" ${devMode ? '' : 'disabled'}>
-                        <input type="number" value="${selectedTower.upgrades[1].damage}" onchange="updateTower(${correctIndex}, 'upgradeLevel1damage', this.value)" ${devMode ? '' : 'disabled'}>
-                        <input type="number" value="${selectedTower.upgrades[2].damage}" onchange="updateTower(${correctIndex}, 'upgradeLevel2damage', this.value)" ${devMode ? '' : 'disabled'}>
+                        <strong>Element:</strong> ${selectedTower.element}
                     </div>
                     <div>
-                        <span>Range:</span>
-                        <input type="number" value="${selectedTower.range}" onchange="updateTower(${correctIndex}, 'range', this.value)" ${devMode ? '' : 'disabled'}>
-                        <input type="number" value="${selectedTower.upgrades[1].range}" onchange="updateTower(${correctIndex}, 'upgradeLevel1range', this.value)" ${devMode ? '' : 'disabled'}>
-                        <input type="number" value="${selectedTower.upgrades[2].range}" onchange="updateTower(${correctIndex}, 'upgradeLevel2range', this.value)" ${devMode ? '' : 'disabled'}>
-                    </div>
-                    <div>
-                        <span>Price:</span>
-                        <input type="number" value="${selectedTower.cost}" onchange="updateTower(${correctIndex}, 'cost', this.value)" ${devMode ? '' : 'disabled'}>
-                        <input type="number" value="${selectedTower.upgrades[0].cost || selectedTower.cost}" onchange="updateTower(${correctIndex}, 'upgradeCost1', this.value)" ${devMode ? '' : 'disabled'}>
-                        <input type="number" value="${selectedTower.upgrades[1].cost || selectedTower.cost * 2}" onchange="updateTower(${correctIndex}, 'upgradeCost2', this.value)" ${devMode ? '' : 'disabled'}>
-                    </div>
-                    ${explosionRadiusField}
-                    <div>
-                        <span>Element: ${selectedTower.element}</span>
-                    </div>
-                    <div>
-                        <span>Elemental Interaction:</span><br>
+                        <strong>Elemental Interaction:</strong><br>
                         <span>- Strong Against: ${strongAgainst}</span><br>
                         <span>- Weak Against: ${weakAgainst}</span>
                     </div>
+                    ${additionalDetails}
+                    ${upgradeDetails}
+                    <div>
+                        <strong>Costs:</strong><br>
+                        - Base: $${selectedTower.cost}<br>
+                        - Level 1 Upgrade: $${upgradeCost1}<br>
+                        - Level 2 Upgrade: $${upgradeCost2}
+                    </div>
                     <button id="upgradeButton" class="button upgrade-button" onclick="highlightUpgradeableTowers('${selectedTower.name}')">Upgrade</button>
                 `;
-                towerStats.innerHTML = statsHTML;
+                towerStats.innerHTML = descriptionHTML;
             }
-            toggleEditability(towerStats, devMode); 
         } else {
             console.error(`Tower button for index ${towerIndex} not found in the DOM`);
         }
     }
+
+    // Update UI state
+    drawGrid(); // Redraw to reflect the new selection (e.g., range ring or highlight)
 }
 // End of tower selection function
+
+
+// Start of function for weak against
+function getWeakAgainst(element) {
+    switch (element) {
+        case 'Neutral': return 'Ghost, Bug';
+        case 'Fire': return 'Fire, Ghost, Bug';
+        case 'Ice': return 'Ice, Ghost, Bug';
+        case 'Water': return 'Water, Ghost, Bug';
+        case 'Wind': return 'Wind, Ghost, Bug';
+        case 'Earth': return 'Earth, Ghost, Bug';
+        case 'Electric': return 'Electric, Ghost, Bug';
+        case 'Light': return 'All others';
+        case 'Chemical': return 'All others';
+        default: return 'None';
+    }
+}
+// End of function for weak against
 
 
 
@@ -4525,124 +4674,169 @@ function selectEnemy(enemyIndex) {
         enemyStats.innerHTML = "<strong>Select an enemy to view and edit stats</strong>";
     } else {
         const selectedEnemy = enemies[enemyIndex - 1];
-        let statsHTML;
 
-        switch(selectedEnemy.element) {
-            case 'Neutral':
-                statsHTML = `
-                    <strong>${selectedEnemy.name}</strong><br>
-                    Speed: <input type="number" value="${selectedEnemy.speed}" min="0.1" step="0.1" onchange="updateEnemy(${enemyIndex - 1}, 'speed', this.value)" /><br>
-                    HP: <input type="number" value="${selectedEnemy.hp}" onchange="updateEnemy(${enemyIndex - 1}, 'hp', this.value)" /><br>
-                    Gold Value: <input type="number" value="${selectedEnemy.value}" onchange="updateEnemy(${enemyIndex - 1}, 'value', this.value)" /><br>
-                    <strong>Element:</strong> ${selectedEnemy.element}<br>
+        if (devMode) {
+            // Dev Mode: Keep input boxes for editing stats
+            let statsHTML = '';
+            let strongAgainst = getStrongAgainstEnemy(selectedEnemy.element);
+            let weakAgainst = getWeakAgainstEnemy(selectedEnemy.element);
+
+            statsHTML = `
+                <strong>${selectedEnemy.name}</strong><br>
+                Speed: <input type="number" value="${selectedEnemy.speed}" min="0.1" step="0.1" onchange="updateEnemy(${enemyIndex - 1}, 'speed', this.value)" /><br>
+                HP: <input type="number" value="${selectedEnemy.hp}" onchange="updateEnemy(${enemyIndex - 1}, 'hp', this.value)" /><br>
+                Gold Value: <input type="number" value="${selectedEnemy.value}" onchange="updateEnemy(${enemyIndex - 1}, 'value', this.value)" /><br>
+                <strong>Element:</strong> ${selectedEnemy.element}<br>
+                <strong>Elemental Interaction:</strong><br>
+                <span>- Strong Against: ${strongAgainst}</span><br>
+                <span>- Weak Against: ${weakAgainst}</span>
+            `;
+            enemyStats.innerHTML = statsHTML;
+            toggleEditability(enemyStats, devMode); // Ensure inputs are editable
+        } else {
+            // Normal Mode: Descriptive overview without input boxes
+            let enemyType = '';
+            let behavior = '';
+            let threatLevel = '';
+            let counterStrategy = '';
+            let strongAgainst = getStrongAgainstEnemy(selectedEnemy.element);
+            let weakAgainst = getWeakAgainstEnemy(selectedEnemy.element);
+
+            // Define enemy-specific details
+            switch (selectedEnemy.name) {
+                case "Pinky":
+                    enemyType = "Standard Ground";
+                    behavior = "A basic foe that marches steadily toward the exit.";
+                    threatLevel = "Low";
+                    counterStrategy = "Easily handled by any attack tower.";
+                    break;
+                case "Greeny":
+                    enemyType = "Standard Ground";
+                    behavior = "Moves at a moderate pace, slightly tougher than Pinky.";
+                    threatLevel = "Low";
+                    counterStrategy = "Standard towers work well.";
+                    break;
+                case "Yella":
+                    enemyType = "Standard Ground";
+                    behavior = "Quick and sturdy, rushing to escape.";
+                    threatLevel = "Moderate";
+                    counterStrategy = "Use towers with good range or slowing effects.";
+                    break;
+                case "Berry":
+                    enemyType = "Standard Ground";
+                    behavior = "Fast and resilient, a persistent threat.";
+                    threatLevel = "Moderate";
+                    counterStrategy = "High-damage or area attack towers recommended.";
+                    break;
+                case "Smokey":
+                    enemyType = "Standard Ground";
+                    behavior = "Burns with fiery determination, shrugging off some damage.";
+                    threatLevel = "Moderate";
+                    counterStrategy = "Water-based towers extinguish it quickly.";
+                    break;
+                case "Chilly":
+                    enemyType = "Standard Ground";
+                    behavior = "Chills the air, moving steadily with icy resilience.";
+                    threatLevel = "Moderate";
+                    counterStrategy = "Fire towers melt through its defenses.";
+                    break;
+                case "Wetta":
+                    enemyType = "Standard Ground";
+                    behavior = "Sloshes forward with watery toughness.";
+                    threatLevel = "Moderate";
+                    counterStrategy = "Ice towers freeze it in its tracks.";
+                    break;
+                case "Windy":
+                    enemyType = "Standard Ground";
+                    behavior = "Swift as the wind, darting toward the goal.";
+                    threatLevel = "Moderate";
+                    counterStrategy = "Electric towers ground its speed.";
+                    break;
+                case "Rocky":
+                    enemyType = "Standard Ground";
+                    behavior = "A slow-moving tank, built like a boulder.";
+                    threatLevel = "High";
+                    counterStrategy = "Wind towers erode its bulk.";
+                    break;
+                case "Sparky":
+                    enemyType = "Standard Ground";
+                    behavior = "Crackles with energy, zapping along the path.";
+                    threatLevel = "Moderate";
+                    counterStrategy = "Earth towers short-circuit its power.";
+                    break;
+                case "Wraith":
+                    enemyType = "Flying";
+                    behavior = "Glides through the air, ignoring obstacles.";
+                    threatLevel = "High";
+                    counterStrategy = "Light-based towers (Aero Cannon) banish it.";
+                    break;
+                case "Buggy":
+                    enemyType = "Tower Attacker";
+                    behavior = "Scurries to chew on your towers, weakening them.";
+                    threatLevel = "High";
+                    counterStrategy = "Chemical towers (Pesticide) exterminate it.";
+                    break;
+            }
+
+            let descriptionHTML = `
+                <div style="font-size: 18px; font-weight: bold;">${selectedEnemy.name}</div>
+                <div>
+                    <strong>Type:</strong> ${enemyType}
+                </div>
+                <div>
+                    <strong>Element:</strong> ${selectedEnemy.element}
+                </div>
+                <div>
                     <strong>Elemental Interaction:</strong><br>
-                    - <strong>Resistant To:</strong> Light, Chemical<br>
-                    - <strong>Vulnerable To:</strong> All others
-                `;
-                break;
-            case 'Fire':
-                statsHTML = `
-                    <strong>${selectedEnemy.name}</strong><br>
-                    Speed: <input type="number" value="${selectedEnemy.speed}" min="0.1" step="0.1" onchange="updateEnemy(${enemyIndex - 1}, 'speed', this.value)" /><br>
-                    HP: <input type="number" value="${selectedEnemy.hp}" onchange="updateEnemy(${enemyIndex - 1}, 'hp', this.value)" /><br>
-                    Gold Value: <input type="number" value="${selectedEnemy.value}" onchange="updateEnemy(${enemyIndex - 1}, 'value', this.value)" /><br>
-                    <strong>Element:</strong> ${selectedEnemy.element}<br>
-                    <strong>Elemental Interaction:</strong><br>
-                    - <strong>Resistant To:</strong> Fire, Light, Chemical<br>
-                    - <strong>Vulnerable To:</strong> Water
-                `;
-                break;
-            case 'Ice':
-                statsHTML = `
-                    <strong>${selectedEnemy.name}</strong><br>
-                    Speed: <input type="number" value="${selectedEnemy.speed}" min="0.1" step="0.1" onchange="updateEnemy(${enemyIndex - 1}, 'speed', this.value)" /><br>
-                    HP: <input type="number" value="${selectedEnemy.hp}" onchange="updateEnemy(${enemyIndex - 1}, 'hp', this.value)" /><br>
-                    Gold Value: <input type="number" value="${selectedEnemy.value}" onchange="updateEnemy(${enemyIndex - 1}, 'value', this.value)" /><br>
-                    <strong>Element:</strong> ${selectedEnemy.element}<br>
-                    <strong>Elemental Interaction:</strong><br>
-                    - <strong>Resistant To:</strong> Ice, Light, Chemical<br>
-                    - <strong>Vulnerable To:</strong> Fire
-                `;
-                break;
-            case 'Water':
-                statsHTML = `
-                    <strong>${selectedEnemy.name}</strong><br>
-                    Speed: <input type="number" value="${selectedEnemy.speed}" min="0.1" step="0.1" onchange="updateEnemy(${enemyIndex - 1}, 'speed', this.value)" /><br>
-                    HP: <input type="number" value="${selectedEnemy.hp}" onchange="updateEnemy(${enemyIndex - 1}, 'hp', this.value)" /><br>
-                    Gold Value: <input type="number" value="${selectedEnemy.value}" onchange="updateEnemy(${enemyIndex - 1}, 'value', this.value)" /><br>
-                    <strong>Element:</strong> ${selectedEnemy.element}<br>
-                    <strong>Elemental Interaction:</strong><br>
-                    - <strong>Resistant To:</strong> Water, Light, Chemical<br>
-                    - <strong>Vulnerable To:</strong> Ice
-                `;
-                break;
-            case 'Wind':
-                statsHTML = `
-                    <strong>${selectedEnemy.name}</strong><br>
-                    Speed: <input type="number" value="${selectedEnemy.speed}" min="0.1" step="0.1" onchange="updateEnemy(${enemyIndex - 1}, 'speed', this.value)" /><br>
-                    HP: <input type="number" value="${selectedEnemy.hp}" onchange="updateEnemy(${enemyIndex - 1}, 'hp', this.value)" /><br>
-                    Gold Value: <input type="number" value="${selectedEnemy.value}" onchange="updateEnemy(${enemyIndex - 1}, 'value', this.value)" /><br>
-                    <strong>Element:</strong> ${selectedEnemy.element}<br>
-                    <strong>Elemental Interaction:</strong><br>
-                    - <strong>Resistant To:</strong> Wind, Light, Chemical<br>
-                    - <strong>Vulnerable To:</strong> Electric
-                `;
-                break;
-            case 'Earth':
-                statsHTML = `
-                    <strong>${selectedEnemy.name}</strong><br>
-                    Speed: <input type="number" value="${selectedEnemy.speed}" min="0.1" step="0.1" onchange="updateEnemy(${enemyIndex - 1}, 'speed', this.value)" /><br>
-                    HP: <input type="number" value="${selectedEnemy.hp}" onchange="updateEnemy(${enemyIndex - 1}, 'hp', this.value)" /><br>
-                    Gold Value: <input type="number" value="${selectedEnemy.value}" onchange="updateEnemy(${enemyIndex - 1}, 'value', this.value)" /><br>
-                    <strong>Element:</strong> ${selectedEnemy.element}<br>
-                    <strong>Elemental Interaction:</strong><br>
-                    - <strong>Resistant To:</strong> Earth, Light, Chemical<br>
-                    - <strong>Vulnerable To:</strong> Wind
-                `;
-                break;
-            case 'Electric':
-                statsHTML = `
-                    <strong>${selectedEnemy.name}</strong><br>
-                    Speed: <input type="number" value="${selectedEnemy.speed}" min="0.1" step="0.1" onchange="updateEnemy(${enemyIndex - 1}, 'speed', this.value)" /><br>
-                    HP: <input type="number" value="${selectedEnemy.hp}" onchange="updateEnemy(${enemyIndex - 1}, 'hp', this.value)" /><br>
-                    Gold Value: <input type="number" value="${selectedEnemy.value}" onchange="updateEnemy(${enemyIndex - 1}, 'value', this.value)" /><br>
-                    <strong>Element:</strong> ${selectedEnemy.element}<br>
-                    <strong>Elemental Interaction:</strong><br>
-                    - <strong>Resistant To:</strong> Electric, Light, Chemical<br>
-                    - <strong>Vulnerable To:</strong> Earth
-                `;
-                break;
-            case 'Ghost':
-                statsHTML = `
-                    <strong>${selectedEnemy.name}</strong><br>
-                    Speed: <input type="number" value="${selectedEnemy.speed}" min="0.1" step="0.1" onchange="updateEnemy(${enemyIndex - 1}, 'speed', this.value)" /><br>
-                    HP: <input type="number" value="${selectedEnemy.hp}" onchange="updateEnemy(${enemyIndex - 1}, 'hp', this.value)" /><br>
-                    Gold Value: <input type="number" value="${selectedEnemy.value}" onchange="updateEnemy(${enemyIndex - 1}, 'value', this.value)" /><br>
-                    <strong>Element:</strong> ${selectedEnemy.element}<br>
-                    <strong>Elemental Interaction:</strong><br>
-                    - <strong>Resistant To:</strong> All Others<br>
-                    - <strong>Vulnerable To:</strong> Light<br>
-                    - <strong>Specific Tower Counter:</strong> Aero Cannon
-                `;
-                break;
-            case 'Bug':
-                statsHTML = `
-                    <strong>${selectedEnemy.name}</strong><br>
-                    Speed: <input type="number" value="${selectedEnemy.speed}" min="0.1" step="0.1" onchange="updateEnemy(${enemyIndex - 1}, 'speed', this.value)" /><br>
-                    HP: <input type="number" value="${selectedEnemy.hp}" onchange="updateEnemy(${enemyIndex - 1}, 'hp', this.value)" /><br>
-                    Gold Value: <input type="number" value="${selectedEnemy.value}" onchange="updateEnemy(${enemyIndex - 1}, 'value', this.value)" /><br>
-                    <strong>Element:</strong> ${selectedEnemy.element}<br>
-                    <strong>Elemental Interaction:</strong><br>
-                    - <strong>Resistant To:</strong> All Others<br>
-                    - <strong>Vulnerable To:</strong> Chemical<br>
-                    - <strong>Specific Tower Counter:</strong> Pesticide
-                `;
-                break;
+                    <span>- Strong Against: ${strongAgainst}</span><br>
+                    <span>- Weak Against: ${weakAgainst}</span>
+                </div>
+                <div>
+                    <strong>Behavior:</strong><br>
+                    ${behavior}
+                </div>
+                <div>
+                    <strong>Threat Level:</strong> ${threatLevel}
+                </div>
+                <div>
+                    <strong>Counter Strategy:</strong><br>
+                    ${counterStrategy}
+                </div>
+            `;
+            enemyStats.innerHTML = descriptionHTML;
         }
+    }
+}
 
-        // Set the innerHTML before toggling editability
-        enemyStats.innerHTML = statsHTML;
-        toggleEditability(enemyStats, devMode); // Ensure editability based on devMode
+// Helper function for enemy strong against (based on your elemental system)
+function getStrongAgainstEnemy(element) {
+    switch (element) {
+        case 'Neutral': return 'None';
+        case 'Fire': return 'Fire';
+        case 'Ice': return 'Ice';
+        case 'Water': return 'Water';
+        case 'Wind': return 'Wind';
+        case 'Earth': return 'Earth';
+        case 'Electric': return 'Electric';
+        case 'Ghost': return 'All except Light';
+        case 'Bug': return 'All except Chemical';
+        default: return 'None';
+    }
+}
+
+// Helper function for enemy weak against (based on your elemental system)
+function getWeakAgainstEnemy(element) {
+    switch (element) {
+        case 'Neutral': return 'Ghost, Bug';
+        case 'Fire': return 'Water';
+        case 'Ice': return 'Fire';
+        case 'Water': return 'Ice';
+        case 'Wind': return 'Electric';
+        case 'Earth': return 'Wind';
+        case 'Electric': return 'Earth';
+        case 'Ghost': return 'Light';
+        case 'Bug': return 'Chemical';
+        default: return 'None';
     }
 }
 // End of enemy selection function
