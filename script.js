@@ -375,10 +375,33 @@ function playTowerShootSound(tower) {
 // End of tower definitions
 
 
+const wavePatterns = [
+    { name: "Regular Easy", desc: "30 waves of moderate enemies, a balanced start.", file: "easy" },
+    { name: "Regular Hard", desc: "75 waves of tougher enemies, a long challenge.", file: "hard" },
+    { name: "Boss Mode", desc: "Fewer waves, but packed with high-HP bosses.", file: "boss_mode" },
+    { name: "Buggy Infestation", desc: "Increased Buggy spawns and holes!", file: "buggy_infest" },
+    { name: "Coming Soon 1", desc: "Stay tuned for more!", file: "coming_soon_1" },
+    { name: "Coming Soon 2", desc: "Stay tuned for more!", file: "coming_soon_2" },
+    { name: "Coming Soon 3", desc: "Stay tuned for more!", file: "coming_soon_3" },
+    { name: "Coming Soon 4", desc: "Stay tuned for more!", file: "coming_soon_4" },
+    { name: "Coming Soon 5", desc: "Stay tuned for more!", file: "coming_soon_5" },
+    { name: "Coming Soon 6", desc: "Stay tuned for more!", file: "coming_soon_6" }
+];
+
+
 // Start of game constants
 const tileSize = 40;
 const stepTime = 1 / 60; // Assuming 60 fps for smooth animation
 // End of game constants
+
+
+// Start of challenge constants
+const challengeFiles = [
+    'easy', 'hard', 'boss_mode', 'buggy_infest',
+    'coming_soon_1', 'coming_soon_2', 'coming_soon_3',
+    'coming_soon_4', 'coming_soon_5', 'coming_soon_6'
+];
+// End of challenge constants
 
 
 
@@ -678,7 +701,7 @@ function spawnHoleFromWave(holeData, entryPoint = null) {
         if (!holes) holes = [];
         holes.push(newHole);
         alarmSound.play();
-        // console.log("Hole spawned at position:", position.x, position.y, "with data:", holeData);
+        console.log("Hole spawned at position:", position.x, position.y, "with data:", holeData);
     } else {
         console.error("Failed to find a valid position for hole spawn in wave", currentWave, "with data:", holeData);
     }
@@ -1101,7 +1124,7 @@ class Bullet {
                     const oldHP = enemy.hp;
                     
                     enemy.hp -= damageDealt;
-                    console.log(`${this.tower.name} hit ${enemy.name} - HP reduced from ${oldHP} to ${enemy.hp}, Damage: ${damageDealt}`);
+                    // console.log(`${this.tower.name} hit ${enemy.name} - HP reduced from ${oldHP} to ${enemy.hp}, Damage: ${damageDealt}`);
                     
                     this.tower.damageDealt = damageDealt;
                     this.damageApplied = true;
@@ -1594,13 +1617,17 @@ function createPesticideEffect(tower, target) {
 function updateHUD() {
     document.getElementById('lives').textContent = lives;
     document.getElementById('gold').textContent = gold;
-    document.getElementById('wave').textContent = currentWave; // Ensure this reflects the current wave
+    document.getElementById('wave').textContent = currentWave;
     document.getElementById('totalWaves').textContent = waves.length;
     document.getElementById('score').textContent = score;
     document.getElementById('gameState').textContent = window.gamePaused ? 'Paused' : 'Playing';
     document.getElementById('difficultyDisplay').textContent = selectedDifficulty ? selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1) : '';
     
-    // Display the countdown in seconds, ensuring one decimal place
+    const highScoreElement = document.getElementById('highScore');
+    if (highScoreElement && selectedDifficulty) {
+        highScoreElement.textContent = `Top Score: ${getTopScore(selectedDifficulty)}`;
+    }
+
     if (waveDelayCountdown > 0) {
         document.getElementById('waveDelayTimer').textContent = `Next Wave in: ${waveDelayCountdown.toFixed(1)} seconds`;
     } else {
@@ -1609,6 +1636,31 @@ function updateHUD() {
 }
 
 // End of HUD update function
+
+
+// Start of leaderboard functions
+function loadLeaderboard(challenge) {
+    const key = `leaderboard_${challenge}`;
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : [0, 0, 0]; // Default top 3: [0, 0, 0]
+}
+
+function saveLeaderboard(challenge, newScore) {
+    const key = `leaderboard_${challenge}`;
+    let scores = loadLeaderboard(challenge);
+    scores.push(newScore);
+    scores.sort((a, b) => b - a); // Descending order
+    scores = scores.slice(0, 3); // Keep top 3
+    localStorage.setItem(key, JSON.stringify(scores));
+    console.log(`Updated leaderboard for ${challenge}: ${scores}`);
+    return scores.indexOf(newScore) !== -1; // True if newScore made the top 3
+}
+
+function getTopScore(challenge) {
+    return loadLeaderboard(challenge)[0]; // Top score is first in sorted array
+}
+// End of leaderboard functions
+
 
 
 // Start of tower update function
@@ -1750,7 +1802,7 @@ function updateTowers(deltaTime) {
                             if (nearestEnemy.name === "Buggy") {
                                 const oldHPPesticide = nearestEnemy.hp;
                                 nearestEnemy.hp -= actualDamage; // Now defined above
-                                console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPPesticide} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
+                                // console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPPesticide} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
                                 tower.damageDealt += actualDamage;
                                 createPesticideEffect(tower, nearestEnemy);
                                 if (nearestEnemy.hp <= 0) {
@@ -1920,7 +1972,7 @@ function killEnemy(enemy, array) {
         array.splice(index, 1);
         gold += enemy.value || 50;
         enemiesKilled++;
-        score++;
+        score += 5; // Base kill value
 
         // Play fart sound only for Buggy deaths with a cooldown
         if (enemy.name === "Buggy") {
@@ -3217,14 +3269,14 @@ function updateGameState(deltaTime) {
     wingAnimation.update();
 
     if (gameStarted) {
-        // Check for game completion only after last wave and all enemies are cleared
         if (currentWave === waves.length && 
             enemiesOnField.length === 0 && 
             wraithsOnField.length === 0 && 
             (!holes || holes.length === 0)) {
-            showGameCompleted();
+            showLeaderboard(); // Replace showGameCompleted
             gameStarted = false;
-            console.log("All waves completed and enemies cleared. Game won!");
+            window.gamePaused = true; // Pause game after completion
+            console.log("All waves completed and enemies cleared. Showing leaderboard.");
         }
     }
 
@@ -3295,16 +3347,15 @@ function removeBuggyFromHole(enemy) {
 let holes = [];
 
 function spawnHole() {
-    // This function is now only called manually or via dev mode, not automatically
     if (!holes || holes.length === 0) {
         let position = getRandomEmptyTileAwayFromPesticide();
         if (position) {
             let newHole = new Hole(position.x, position.y);
             holes.push(newHole);
             alarmSound.play();
-            console.log("Hole spawned at position:", position.x, position.y);
+            console.log(`Manual hole spawn triggered at ${new Date().toISOString()} - Position: (${position.x}, ${position.y}), Hole ID: ${newHole.id}`);
         } else {
-            console.error("Failed to find a valid position for hole spawn in manual/dev mode");
+            console.error(`Failed to find a valid position for manual hole spawn at ${new Date().toISOString()}`);
         }
     }
 }
@@ -3317,104 +3368,140 @@ function getRandomEmptyTileAwayFromPesticide() {
                 let distanceFromPesticide = towersOnGrid
                     .filter(t => t.name === "Pesticide")
                     .reduce((min, t) => Math.min(min, Math.hypot(x - t.x, y - t.y)), Infinity);
-                if (distanceFromPesticide > 3) { 
+                if (distanceFromPesticide > 3) {
                     validTiles.push({x, y});
                 }
             }
         }
     }
     if (validTiles.length === 0) {
-        console.error("No valid tiles found for hole spawn (all tiles blocked or too close to Pesticide towers)");
-        return null;
+        console.warn(`No tiles >3 units from Pesticide at ${new Date().toISOString()} - Falling back to any empty tile`);
+        validTiles = [];
+        for (let y = 0; y < gridHeight; y++) {
+            for (let x = 0; x < gridWidth; x++) {
+                if (!towersOnGrid.some(t => t.x === x && t.y === y)) {
+                    validTiles.push({x, y});
+                }
+            }
+        }
+        if (validTiles.length === 0) {
+            console.error(`No empty tiles available for hole spawn at ${new Date().toISOString()}`);
+            return null;
+        }
     }
-    return validTiles[Math.floor(Math.random() * validTiles.length)];
+    const selectedPosition = validTiles[Math.floor(Math.random() * validTiles.length)];
+    console.log(`Selected hole position: (${selectedPosition.x}, ${selectedPosition.y}) from ${validTiles.length} valid tiles at ${new Date().toISOString()}`);
+    return selectedPosition;
+}
+
+function spawnHoleFromWave(holeData, entryPoint = null) {
+    let position = entryPoint || getRandomEmptyTileAwayFromPesticide();
+    if (position) {
+        let newHole = new Hole(position.x, position.y, holeData);
+        newHole.id = `hole_wave_${currentWave}_${Date.now()}`; // Unique ID for tracking
+        if (!holes) holes = [];
+        holes.push(newHole);
+        alarmSound.play();
+        console.log(`Hole spawn triggered for wave ${currentWave} at ${new Date().toISOString()} - Position: (${position.x}, ${position.y}), Hole ID: ${newHole.id}, Data:`, holeData);
+    } else {
+        console.error(`Failed to find a valid position for hole spawn in wave ${currentWave} at ${new Date().toISOString()} - Data:`, holeData);
+    }
 }
 
 class Hole {
     constructor(x, y, holeData = {}) {
-        this.x = Math.max(0, Math.min(gridWidth - 1, x)); // Ensure within grid bounds
-        this.y = Math.max(0, Math.min(gridHeight - 1, y)); // Ensure within grid bounds
-        this.size = 0;
+        this.x = Math.max(0, Math.min(gridWidth - 1, x));
+        this.y = Math.max(0, Math.min(gridHeight - 1, y));
+        this.size = 0; // Start at 0, grow to maxSize
         this.maxSize = tileSize * 0.75;
         this.startTime = performance.now();
         this.buggiesSpawned = false;
         this.buggiesFromHole = [];
         this.fadeStartTime = null;
-        this.holeData = holeData; // Store wave-specific hole data
+        this.holeData = holeData;
+        this.id = `hole_${Date.now()}`; // Default ID, overridden in spawnHoleFromWave
     }
 
     update() {
+        if (window.gamePaused) return; // Skip updates if paused
+
         const currentTime = performance.now();
         const elapsed = (currentTime - this.startTime) / 1000;
 
-        if (elapsed < 15 && !this.buggiesSpawned) {
+        if (!this.buggiesSpawned) {
             this.size = Math.min(this.maxSize, (this.maxSize / 15) * elapsed);
-        } else if (Math.ceil(this.size * 100) / 100 >= 25 && !this.buggiesSpawned) {  
-            this.spawnBuggies();
+            if (this.size >= 25 && !this.buggiesSpawned) {
+                this.spawnBuggies();
+            }
         }
-        
+
         if (this.buggiesSpawned && this.buggiesFromHole.length === 0) {
             if (!this.fadeStartTime) {
                 this.fadeStartTime = currentTime;
+                console.log(`Hole ${this.id} at (${this.x}, ${this.y}) starting fade-out at ${new Date().toISOString()} - No Buggies left`);
             }
             this.fadeOut(currentTime);
         }
 
-        // Auto fade-out after a fixed time
         this.autoFadeOut(currentTime);
 
         if (this.size <= 0) {
             let index = holes.indexOf(this);
-            if (index !== -1) holes.splice(index, 1);
-            // console.log("Hole at", this.x, this.y, "has completely faded away");
+            if (index !== -1) {
+                holes.splice(index, 1);
+                console.log(`Hole ${this.id} at (${this.x}, ${this.y}) faded away at ${new Date().toISOString()}`);
+            }
         }
     }
 
     draw() {
-        ctx.save();
-        ctx.fillStyle = "rgba(0,0,0,0.5)"; 
-        ctx.beginPath();
-        ctx.arc((this.x + 0.5) * tileSize, (this.y + 0.5) * tileSize, this.size / 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
+        if (this.size > 0) { // Only draw if size is positive
+            ctx.save();
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.beginPath();
+            ctx.arc((this.x + 0.5) * tileSize, (this.y + 0.5) * tileSize, this.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+            // Uncomment for per-frame debug (optional):
+            // console.log(`Drawing hole ${this.id} at (${this.x}, ${this.y}) - Size: ${this.size.toFixed(2)} at ${new Date().toISOString()}`);
+        }
     }
 
     spawnBuggies() {
-        const buggyCount = this.holeData.buggyCount || 1; // Default to 1 if not specified
-        const hpMultiplier = this.holeData.hpMultiplier || 1.0; // Default to 1.0
-        const speedMultiplier = this.holeData.speedMultiplier || 1.0; // Default to 1.0
+        const buggyCount = this.holeData.buggyCount || 1;
+        const hpMultiplier = this.holeData.hpMultiplier || 1.0;
+        const speedMultiplier = this.holeData.speedMultiplier || 1.0;
         for (let i = 0; i < buggyCount; i++) {
             let newBuggy = createBuggyFromHole(this.x, this.y, hpMultiplier, speedMultiplier);
             if (newBuggy) {
-                newBuggy.type = 'buggyFromHole'; 
-                newBuggy.x = Math.max(0.5, Math.min(gridWidth - 0.5, newBuggy.x)); // Ensure within grid bounds
-                newBuggy.y = Math.max(0.5, Math.min(gridHeight - 0.5, newBuggy.y)); // Ensure within grid bounds
+                newBuggy.type = 'buggyFromHole';
+                newBuggy.x = Math.max(0.5, Math.min(gridWidth - 0.5, newBuggy.x));
+                newBuggy.y = Math.max(0.5, Math.min(gridHeight - 0.5, newBuggy.y));
                 enemiesOnField.push(newBuggy);
                 this.buggiesFromHole.push(newBuggy);
-                console.log("Buggy spawned from hole at", newBuggy.x, newBuggy.y, "with HP:", newBuggy.hp, "Speed:", newBuggy.speed);
+                console.log(`Buggy spawned from hole ${this.id} at (${newBuggy.x}, ${newBuggy.y}) at ${new Date().toISOString()} - HP: ${newBuggy.hp}, Speed: ${newBuggy.speed}`);
             } else {
-                console.error("Failed to create buggy for hole at", this.x, this.y);
+                console.error(`Failed to create buggy for hole ${this.id} at (${this.x}, ${this.y}) at ${new Date().toISOString()}`);
             }
         }
-        this.buggiesSpawned = true;  // Set this flag when Buggies are actually spawned
+        this.buggiesSpawned = true;
     }
 
     fadeOut(currentTime) {
         const fadeElapsed = (currentTime - this.fadeStartTime) / 1000;
-        if (fadeElapsed < 5) {  
-            this.size = Math.max(0, this.size - (this.maxSize / 500)); 
-            // console.log("Hole fading at", this.x, this.y, "Current size:", this.size.toFixed(2));
+        if (fadeElapsed < 5) {
+            this.size = Math.max(0, this.size - (this.maxSize / 500));
         } else {
             this.size = 0;
         }
     }
 
     autoFadeOut(currentTime) {
-        const totalTime = 30; // Total time hole should exist, in seconds
-        if (currentTime - this.startTime >= totalTime * 1000) { // Convert to milliseconds
+        const totalTime = 30; // Total lifetime in seconds
+        if (currentTime - this.startTime >= totalTime * 1000) {
             if (!this.fadeStartTime) {
                 this.fadeStartTime = currentTime;
-                // console.log("Auto fade-out initiated for hole at", this.x, this.y);
+                console.log(`Auto fade-out initiated for hole ${this.id} at (${this.x}, ${this.y}) at ${new Date().toISOString()}`);
             }
             this.fadeOut(currentTime);
         }
@@ -3428,7 +3515,7 @@ function createBuggyFromHole(x, y, hpMultiplier = 1.0, speedMultiplier = 1.0) {
         return null;
     }
     return {
-        type: 'buggyFromHole', 
+        type: 'buggyFromHole',
         x: x + 0.5,
         y: y + 0.5,
         path: [],
@@ -3452,7 +3539,7 @@ function removeBuggyFromHole(enemy) {
             let index = hole.buggiesFromHole.indexOf(enemy);
             if (index !== -1) {
                 hole.buggiesFromHole.splice(index, 1);
-                // console.log("Buggy from hole removed at", hole.x, hole.y, ". Remaining:", hole.buggiesFromHole.length);
+                console.log(`Buggy removed from hole ${hole.id} at (${hole.x}, ${hole.y}) at ${new Date().toISOString()} - Remaining: ${hole.buggiesFromHole.length}`);
             }
         });
     }
@@ -4880,52 +4967,68 @@ function updateEnemy(enemyIndex, property, value) {
 
 
 
-// Start of game completed function
-function showGameCompleted() {
-    const gameCompletedDiv = document.createElement('div');
-    gameCompletedDiv.className = 'game-over-popup';
-    gameCompletedDiv.innerHTML = 'Congratulations! You Won!';
-    
-    // Positioning - similar to game over popup
-    const centerX = (12 * tileSize) - (3 * tileSize); // 3 tiles to the left
-    const centerY = (12 * tileSize) - (2 * tileSize); // 2 tiles up
+// Start of Leaderboard function
+function showLeaderboard() {
+    // Calculate final bonuses
+    const livesBonus = lives * 50;
+    const goldBonus = Math.floor(gold * 0.05); // 5% of gold
+    score += livesBonus + goldBonus;
 
-    gameCompletedDiv.style.position = 'absolute';
-    gameCompletedDiv.style.left = `${centerX}px`;
-    gameCompletedDiv.style.top = `${centerY}px`;
-    gameCompletedDiv.style.transform = 'translate(-50%, -50%)'; // Center the div
-    gameCompletedDiv.style.zIndex = '1001'; // Ensure it's above other elements
-    gameCompletedDiv.style.padding = '20px';
-    gameCompletedDiv.style.backgroundColor = 'rgba(0, 255, 0, 0.8)'; // Green for victory
-    gameCompletedDiv.style.color = 'white';
-    gameCompletedDiv.style.borderRadius = '10px';
-    gameCompletedDiv.style.textAlign = 'center';
-    gameCompletedDiv.style.fontSize = '24px';
+    const isNewTopScore = saveLeaderboard(selectedDifficulty, score);
+    const leaderboard = loadLeaderboard(selectedDifficulty);
+    const challengeName = wavePatterns.find(p => p.file === selectedDifficulty)?.name || selectedDifficulty;
 
-    // Play win sound once when game is completed
+    const leaderboardDiv = document.createElement('div');
+    leaderboardDiv.className = 'leaderboard-popup';
+    leaderboardDiv.innerHTML = `
+        <h2>${challengeName} Completed!</h2>
+        <p>Your Score: ${score}</p>
+        <p>Kills: ${enemiesKilled * 5} | Skip Bonus: ${score - (enemiesKilled * 5 + livesBonus + goldBonus)}</p>
+        <p>Lives Bonus: ${livesBonus} | Gold Bonus: ${goldBonus}</p>
+        <h3>Leaderboard</h3>
+        <ol>
+            <li>${leaderboard[0]}</li>
+            <li>${leaderboard[1]}</li>
+            <li>${leaderboard[2]}</li>
+        </ol>
+        ${isNewTopScore ? '<p><strong>New Top Score!</strong></p>' : ''}
+        <button id="playAgainBtn">Play Again</button>
+        <button id="returnToMenuBtn" style="margin-left: 10px;">Main Menu</button>
+    `;
+
+    const centerX = (12 * tileSize) - (3 * tileSize);
+    const centerY = (12 * tileSize) - (2 * tileSize);
+    leaderboardDiv.style.position = 'absolute';
+    leaderboardDiv.style.left = `${centerX}px`;
+    leaderboardDiv.style.top = `${centerY}px`;
+    leaderboardDiv.style.transform = 'translate(-50%, -50%)';
+    leaderboardDiv.style.zIndex = '1001';
+    leaderboardDiv.style.padding = '20px';
+    leaderboardDiv.style.backgroundColor = 'rgba(0, 100, 0, 0.9)';
+    leaderboardDiv.style.color = 'white';
+    leaderboardDiv.style.borderRadius = '10px';
+    leaderboardDiv.style.textAlign = 'center';
+    leaderboardDiv.style.fontSize = '18px';
+    leaderboardDiv.style.boxShadow = '0 0 10px rgba(0, 255, 0, 0.5)';
+
     winSound.play();
-    // console.log("Win sound played for game completion");
 
-    // Add a button for replay if needed
-    const replayButton = document.createElement('button');
-    replayButton.textContent = 'Play Again';
-    replayButton.onclick = () => {
-        gameCompletedDiv.remove();
+    document.getElementById('gameDisplay').appendChild(leaderboardDiv);
+
+    document.getElementById('playAgainBtn').onclick = () => {
+        leaderboardDiv.remove();
         resetGame();
     };
-    replayButton.style.marginTop = '10px';
-    replayButton.style.padding = '5px 10px';
-    gameCompletedDiv.appendChild(replayButton);
+    document.getElementById('returnToMenuBtn').onclick = () => {
+        leaderboardDiv.remove();
+        resetGame();
+        document.getElementById('waveSelection').style.display = 'block'; // Return to challenge selection
+    };
 
-    document.getElementById('gameDisplay').appendChild(gameCompletedDiv);
-
-    // Prevent clicks on game completed popup from passing through to the grid
-    gameCompletedDiv.addEventListener('click', (e) => {
-        e.stopPropagation();
-        console.log('Click intercepted by game completed popup');
-    });
+    leaderboardDiv.addEventListener('click', (e) => e.stopPropagation());
 }
-// End of game completed function
+// End of Leaderboard function
+
 
 
 // Start of element icon drawing functions
@@ -5116,7 +5219,7 @@ function drawBugIcon(ctx, center) {
 
 
 
-// Start of game setup and initialization
+// Start of game setup and initialization// Start of game setup and initialization
 document.addEventListener('DOMContentLoaded', async () => {
     createTowerButtons(); 
     createEnemyButtons();
@@ -5206,19 +5309,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     waveSelectionDiv.style.overflowY = 'auto';
     document.body.appendChild(waveSelectionDiv);
 
-    const wavePatterns = [
-        { name: "Regular Easy", desc: "30 waves of moderate enemies, a balanced start.", file: "easy" },
-        { name: "Regular Hard", desc: "75 waves of tougher enemies, a long challenge.", file: "hard" },
-        { name: "Boss Mode", desc: "Fewer waves, but packed with high-HP bosses.", file: "boss_mode" },
-        { name: "Buggy Infestation", desc: "Increased Buggy spawns and holes!", file: "buggy_infest" },
-        { name: "Coming Soon 1", desc: "Stay tuned for more!", file: null },
-        { name: "Coming Soon 2", desc: "Stay tuned for more!", file: null },
-        { name: "Coming Soon 3", desc: "Stay tuned for more!", file: null },
-        { name: "Coming Soon 4", desc: "Stay tuned for more!", file: null },
-        { name: "Coming Soon 5", desc: "Stay tuned for more!", file: null },
-        { name: "Coming Soon 6", desc: "Stay tuned for more!", file: null }
-    ];
-
     waveSelectionDiv.innerHTML = `
         <h2>Choose Your Challenge</h2>
         <div id="waveOptions" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;"></div>
@@ -5237,7 +5327,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <p>${pattern.desc}</p>
             <button class="wave-play-btn" ${pattern.file ? '' : 'disabled'}>Play</button>
         `;
-        if (pattern.file) {
+        if (pattern.file && !pattern.file.startsWith('coming_soon')) {
             optionDiv.querySelector('.wave-play-btn').addEventListener('click', async () => {
                 selectedDifficulty = pattern.file;
                 await loadWaves(selectedDifficulty);
@@ -5276,10 +5366,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     skipWaveButton.addEventListener('click', skipWaveDelay);
 
     function skipWaveDelay() {
-        if (waveDelayCountdown > 0) {
-            const pointsBonus = Math.floor(waveDelayCountdown * 10);
-            score += pointsBonus; 
-            // console.log(`Skipped wave delay. Bonus points: ${pointsBonus}. New Score: ${score}`);
+    if (waveDelayCountdown > 0) {
+        const pointsBonus = Math.floor(waveDelayCountdown * 10);
+        score += pointsBonus;
+        console.log(`Skipped wave delay. Bonus points: ${pointsBonus}. New Score: ${score}`);
             
             if (!window.gamePaused) {
                 skipSound.play();

@@ -20,11 +20,20 @@
             </div>
             <div id="gameDisplay">
                 <div class="hud" id="hud">
-                    Lives: <span id="lives">20</span> | Gold: <span id="gold">2000</span> | Wave: <span id="wave">0</span> / <span id="totalWaves">99</span> | Score: <span id="score">0</span> | <span id="gameState">Playing</span> | Difficulty: <span id="difficultyDisplay"></span>
+                    <div id="gameInfo">
+                        <div>Lives: <span id="lives">20</span></div>
+                        <div>Gold: <span id="gold">2000</span></div>
+                        <div>Wave: <span id="wave">0</span>/<span id="totalWaves">99</span></div>
+                        <div>Score: <span id="score">0</span></div>
+                        <div>Top Score: <span id="highScore">0</span></div> <!-- Added for leaderboard -->
+                        <div>Game State: <span id="gameState">Playing</span></div>
+                        <div>Challenge: <span id="difficultyDisplay"></span></div> <!-- Renamed to Challenge -->
+                    </div>
                 </div>
                 <div id="effectLayer">
                     <canvas id="gameCanvas"></canvas>
                 </div>
+                <!-- Wave selection and settings panels will be appended here dynamically -->
             </div>
             <div id="rightPanel">
                 <div id="enemyWindow">
@@ -47,7 +56,7 @@
             <button id="devModeToggle" class="dev-button">Dev Mode: OFF</button>
             <button id="spawnToggle" class="spawn-button">Spawn Mode: OFF</button>
             <button id="skipWaveDelay" class="skip-button">Send Next Wave</button>
-        </div>
+         </div>
     </div>
     <div id="startMenu" style="display: none;">
         <h2>TowerZZ</h2>

@@ -8,7 +8,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    font-size: 16px; /* Maintain base font size for other elements */
+    font-size: 16px;
     overflow: hidden;
 }
 
@@ -23,71 +23,68 @@ body {
 #gameContainer {
     display: flex;
     width: 100%;
-    height: calc(100vh - 80px); /* Full height minus HUD height */
+    height: calc(100vh - 80px);
     overflow: hidden;
     min-width: 0;
-    max-width: 100%; /* Allow full screen width */
-    align-items: stretch; /* Ensure panels and game stretch vertically */
-    justify-content: center; /* Center the entire layout horizontally */
+    max-width: 100%;
+    align-items: stretch;
+    justify-content: center;
 }
 
-/* Panels with adjusted widths on desktop, scaling on smaller screens */
 #leftPanel {
-    width: 270px; /* Maintain increased width on standard screens */
-    padding: 6px; /* Maintain padding for larger text */
+    width: 270px;
+    padding: 6px;
     box-sizing: border-box;
-    overflow-y: auto; /* Vertical scroll if content overflows */
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-y: auto;
+    overflow-x: hidden;
     flex-shrink: 0;
     background-color: #333;
     border-right: 1px solid #555;
     border-left: 1px solid #555;
-    max-height: 100%; /* Stretch to full container height */
+    max-height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Push content to top, align bottom with grid */
-    min-width: 200px; /* Minimum width to prevent shrinking */
+    justify-content: space-between;
+    min-width: 200px;
 }
 
 #rightPanel {
-    width: 230px; /* Maintain reduced width on standard screens */
-    padding: 12px; /* Maintain padding for larger text */
+    width: 230px;
+    padding: 12px;
     box-sizing: border-box;
-    overflow-y: auto; /* Vertical scroll if content overflows */
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-y: auto;
+    overflow-x: hidden;
     flex-shrink: 0;
     background-color: #333;
     border-right: 1px solid #555;
     border-left: 1px solid #555;
-    max-height: 100%; /* Stretch to full container height */
+    max-height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Push content to top, align bottom with grid */
-    min-width: 200px; /* Minimum width to prevent shrinking */
+    justify-content: space-between;
+    min-width: 200px;
 }
 
-/* Game display centered with controlled size */
 #gameDisplay {
-    flex: 1; /* Take remaining space, but control max size */
+    flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 12px; /* Maintain padding for larger text */
+    padding: 12px;
     box-sizing: border-box;
     align-items: center;
     position: relative;
     overflow: hidden;
-    max-width: 1000px; /* Maintain 1000px grid */
-    min-width: 300px; /* Minimum width for small screens */
-    height: 100%; /* Stretch to full height */
-    margin: 0 10px; /* Add small margins for centering */
+    max-width: 1000px;
+    min-width: 300px;
+    height: 100%;
+    margin: 0 10px;
 }
 
-/* HUD styling, compact and readable, centered */
 .hud {
-    margin-bottom: 12px; /* Maintain margin for larger text */
-    font-size: 16px; /* Maintain larger HUD text */
+    margin-bottom: 12px;
+    font-size: 16px;
     background-color: rgba(0, 0, 0, 0.8);
-    padding: 12px 18px; /* Maintain padding for larger text */
+    padding: 12px 18px;
     border-radius: 8px;
     text-align: center;
     width: 100%;
@@ -95,52 +92,62 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 8px 12px; /* Maintain gap for larger text */
+    gap: 8px 12px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    max-width: 1200px; /* Limit HUD width on ultrawide */
+    max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
 }
 
-/* Styling for each HUD element */
+#gameInfo {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px 12px;
+    width: 100%;
+}
+
 .hud span {
-    padding: 4px 8px; /* Maintain padding for larger text */
+    padding: 4px 8px;
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
     display: inline-block;
-    font-size: 16px; /* Maintain larger HUD text */
+    font-size: 16px;
 }
 
-/* Adding a subtle border for separation */
 .hud span:not(:last-child) {
     border-right: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Specific styling for game state */
 .hud #gameState {
-    font-size: 14px; /* Maintain slightly smaller game state text */
+    font-size: 14px;
     background-color: transparent;
     padding: 0;
     border: none;
 }
 
+.hud #highScore {
+    color: #ffd700; /* Gold color for top score */
+    font-weight: bold;
+}
+
 #gameCanvas {
     width: 100%;
     height: auto;
-    aspect-ratio: 1 / 1; /* Maintain square grid */
+    aspect-ratio: 1 / 1;
     border: 2px solid #fff;
     background-color: #444;
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    max-width: 1000px; /* Maintain 1000px grid */
-    max-height: 1000px; /* Match width for square aspect */
+    max-width: 1000px;
+    max-height: 1000px;
     min-width: 0;
-    object-fit: contain; /* Ensure grid scales proportionally */
-    margin-bottom: 10px; /* Fine-tune to align with upgrade buttons */
+    object-fit: contain;
+    margin-bottom: 10px;
 }
 
-/* Ensure panels align their bottoms with the grid */
 #leftPanel > *, #rightPanel > * {
-    margin-bottom: 12px; /* Maintain margin for larger text */
+    margin-bottom: 12px;
 }
 
 #effectLayer {
@@ -153,29 +160,28 @@ body {
     background-color: #333;
     padding: 4px;
     border-radius: 8px;
-    margin-bottom: 8px; /* Maintain margin for larger text */
+    margin-bottom: 8px;
     overflow-y: auto;
     overflow-x: hidden;
     height: auto;
-    min-height: calc(80px + 180px); /* Maintain min-height for larger text */
+    min-height: calc(80px + 180px);
     border: 1px solid #555;
     box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
-    flex-grow: 1; /* Allow panels to grow to fill available space */
+    flex-grow: 1;
 }
 
-/* Ensure buttons fill their container width with larger text */
 .button, .start-button, .pause-button, .reset-button, .tower-button, .enemy-button, .dev-button, .spawn-button, .skip-button {
-    height: 34px; /* Maintain height for larger text */
+    height: 34px;
     width: 100%;
-    padding: 6px 12px; /* Maintain padding for larger text */
+    padding: 6px 12px;
     background-color: #555;
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.1s ease;
-    margin: 0 0 6px 0; /* Maintain margin for larger text */
-    font-size: 15px; /* Maintain larger button text */
+    margin: 0 0 6px 0;
+    font-size: 15px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -207,21 +213,21 @@ body {
 }
 
 .tower-button canvas.tower-icon, .tower-button canvas.element-icon {
-    margin-right: 6px; /* Maintain margin for larger text */
+    margin-right: 6px;
 }
 
 .tower-button .tower-icon {
-    width: 32px; /* Maintain slightly larger icons */
+    width: 32px;
     height: 32px;
 }
 
 .tower-button .element-icon {
-    width: 22px; /* Maintain slightly larger icons */
+    width: 22px;
     height: 22px;
 }
 
 .tower-button .tower-name, .tower-button .price {
-    margin: 0 6px; /* Maintain margin for larger text */
+    margin: 0 6px;
 }
 
 .tower-button .tower-name {
@@ -237,7 +243,7 @@ body {
 }
 
 .icon {
-    width: 18px; /* Maintain larger icon size */
+    width: 18px;
     height: 18px;
     border-radius: 6px;
 }
@@ -246,11 +252,11 @@ body {
     background-color: #4CAF50;
     border: none;
     color: white;
-    padding: 6px 12px; /* Maintain padding for larger text */
+    padding: 6px 12px;
     text-align: center;
     text-decoration: none;
-    font-size: 16px; /* Maintain larger button text */
-    margin: 8px 0 0 0; /* Maintain margin for larger text */
+    font-size: 16px;
+    margin: 8px 0 0 0;
     cursor: pointer;
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -263,100 +269,76 @@ body {
 }
 
 .enemy-button .element-icon {
-    width: 18px; /* Maintain larger icon size */
+    width: 18px;
     height: 18px;
-    margin-right: 6px; /* Maintain margin for larger text */
+    margin-right: 6px;
 }
 
 .enemy-button canvas.enemy-icon {
-    width: 22px; /* Maintain slightly larger icons */
+    width: 22px;
     height: 22px;
-    margin-right: 6px; /* Maintain margin for larger text */
+    margin-right: 6px;
 }
 
 .enemy-button .enemy-name {
     flex-grow: 1;
-    margin: 0 6px; /* Maintain margin for larger text */
+    margin: 0 6px;
     font-weight: bold;
 }
 
-/* Updated stats section for tower and enemy windows - Reduce font size for all */
 .stats {
     background-color: #3a3a3a;
-    padding: 8px; /* Maintain padding for larger text */
+    padding: 8px;
     border-radius: 8px;
     border: 1px solid #666;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     color: #ddd;
-    line-height: 1.4; /* Maintain line height to tighten vertical spacing */
-    flex-grow: 1; /* Allow stats to grow to fill panel */
+    line-height: 1.4;
+    flex-grow: 1;
 }
 
-/* Normal Mode: Descriptive text styling - Reduce font size for all */
 #towerStats, #enemyStats {
-    font-size: 14px; /* Reduced from 15px for all towers and enemies */
+    font-size: 14px;
 }
 
-/* Bolded labels in descriptions */
 #towerStats strong, #enemyStats strong {
     color: #fff;
     font-weight: 600;
-    margin-bottom: 0; /* Remove margin below strong elements to minimize gaps */
+    margin-bottom: 0;
 }
 
-/* Tower and Enemy Name - Reduce font size slightly for all */
 #towerStats .tower-name, #enemyStats > div:first-child {
-    font-size: 19px; /* Reduced from 21px for all towers and enemies */
+    font-size: 19px;
     font-weight: bold;
     color: #ffd700;
-    margin-bottom: 4px; /* Maintain minimal margin for name */
+    margin-bottom: 4px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* Descriptive sections - Minimize gaps */
 #towerStats > div, #enemyStats > div {
-    margin-bottom: 4px; /* Maintain minimal gap between sections */
-    padding-left: 2px; /* Maintain minimal padding */
+    margin-bottom: 4px;
+    padding-left: 2px;
     border-left: 2px solid #555;
 }
 
-/* Nested spans for elemental interactions and costs - Minimize gaps */
 #towerStats span, #enemyStats span {
-    display: block; /* Ensure bullet points stack correctly */
-    margin-left: 4px; /* Maintain minimal margin for bullet points */
+    display: block;
+    margin-left: 4px;
     color: #bbb;
-    font-size: 14px; /* Match reduced description font size */
-    margin-bottom: 0; /* Remove margin below spans to minimize gaps */
-    margin-top: 0; /* Remove margin above spans to eliminate gaps */
+    font-size: 14px;
+    margin-bottom: 0;
+    margin-top: 0;
 }
 
-/* Ensure no extra gaps for Elemental Interaction, especially between Strong and Weak Against */
-#towerStats > div:contains("Elemental Interaction:"), #enemyStats > div:contains("Elemental Interaction:") {
-    margin-bottom: 0; /* Remove margin below Elemental Interaction: label */
-}
-
-#towerStats > div:contains("Elemental Interaction:") span,
-#enemyStats > div:contains("Elemental Interaction:") span {
-    margin-top: 0; /* Remove margin above bullet points */
-    margin-bottom: 0; /* Remove margin below bullet points */
-}
-
-/* Specifically target and remove gap between Strong Against and Weak Against */
-#towerStats > div:contains("Elemental Interaction:") span:not(:last-child),
-#enemyStats > div:contains("Elemental Interaction:") span:not(:last-child) {
-    margin-bottom: 0; /* Remove margin between bullet points (e.g., Strong Against and Weak Against) */
-}
-
-/* Dev Mode: Input boxes - Maintain larger text */
 .stats input[type="number"] {
-    width: 70px; /* Maintain increased width */
-    padding: 6px; /* Maintain increased padding */
-    margin: 4px 6px 4px 0; /* Maintain increased margin */
+    width: 70px;
+    padding: 6px;
+    margin: 4px 6px 4px 0;
     background-color: #555;
     color: white;
     border: 1px solid #777;
     border-radius: 5px;
-    font-size: 14px; /* Maintain larger text */
+    font-size: 14px;
 }
 
 .stats input[type="number"]:disabled {
@@ -365,22 +347,21 @@ body {
     border-color: #666;
 }
 
-/* Game Controls */
 #gameControls {
     display: flex;
     justify-content: center;
-    padding: 12px 0; /* Maintain padding for larger text */
+    padding: 12px 0;
     width: 100%;
-    max-width: 1200px; /* Limit controls width on ultrawide */
+    max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
 }
 
-.start-button, .pause-button, .reset-button, .dev-button, .spawn-button, .skip-button {
+.start-button, .pause-button, .reset-button, .dev-button, .spawn-button, .skip-button, .settings-button {
     flex: 0 0 auto;
-    margin: 0 8px; /* Maintain margin for larger text */
+    margin: 0 8px;
     width: auto;
-    font-size: 16px; /* Maintain larger text */
+    font-size: 16px;
 }
 
 .dev-button {
@@ -407,16 +388,15 @@ body {
     background-color: #ff4500;
 }
 
-/* Settings Panel */
 .settings-button {
-    padding: 6px 12px; /* Maintain padding for larger text */
-    margin: 6px; /* Maintain margin for larger text */
+    padding: 6px 12px;
+    margin: 6px;
     background-color: #444;
     color: white;
     border: 1px solid #666;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 16px; /* Maintain larger text */
+    font-size: 16px;
 }
 
 .settings-button:hover {
@@ -433,7 +413,7 @@ body {
 #settingsPanel input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
-    height: 10px; /* Maintain slightly larger for larger text */
+    height: 10px;
     background: #666;
     border-radius: 6px;
     outline: none;
@@ -442,7 +422,7 @@ body {
 #settingsPanel input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 18px; /* Maintain larger thumb */
+    width: 18px;
     height: 18px;
     background: #00ff00;
     border-radius: 50%;
@@ -454,7 +434,7 @@ body {
 }
 
 #settingsPanel input[type="range"]::-moz-range-thumb {
-    width: 18px; /* Maintain larger thumb */
+    width: 18px;
     height: 18px;
     background: #00ff00;
     border-radius: 50%;
@@ -465,7 +445,6 @@ body {
     background: #0000ff;
 }
 
-/* Wave Selection Window */
 #waveSelection {
     width: 450px;
     max-height: 60vh;
@@ -476,25 +455,25 @@ body {
 }
 
 #waveSelection h3 {
-    margin: 8px 0; /* Maintain margin for larger text */
+    margin: 8px 0;
     color: #ffd700;
-    font-size: 20px; /* Maintain larger header text */
+    font-size: 20px;
 }
 
 #waveSelection p {
-    margin: 8px 0; /* Maintain margin for larger text */
-    font-size: 14px; /* Maintain larger paragraph text */
+    margin: 8px 0;
+    font-size: 14px;
     color: #bbb;
 }
 
 #waveSelection .wave-play-btn {
-    padding: 6px 12px; /* Maintain padding for larger text */
+    padding: 6px 12px;
     background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px; /* Maintain larger button text */
+    font-size: 14px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -510,23 +489,22 @@ body {
 #waveDelayTimerRow {
     width: 100%;
     text-align: center;
-    margin: 12px 0; /* Maintain margin for larger text */
+    margin: 12px 0;
     color: #ff6347;
-    font-size: 18px; /* Maintain larger text */
+    font-size: 18px;
     font-weight: bold;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* Tooltips */
 .enemy-stats-tooltip, .tower-stats-tooltip {
     position: fixed;
     color: white;
     background-color: rgba(0, 0, 0, 0.7);
-    padding: 10px; /* Maintain padding for larger text */
+    padding: 10px;
     border-radius: 6px;
     z-index: 1000;
     pointer-events: none;
-    font-size: 14px; /* Maintain larger text */
+    font-size: 14px;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
     border: 1px solid rgba(255,255,255,0.1);
     transition: opacity 0.5s;
@@ -537,33 +515,32 @@ body {
     position: absolute;
     color: white;
     background-color: rgba(255, 0, 0, 0.7);
-    padding: 6px; /* Maintain padding for larger text */
+    padding: 6px;
     border-radius: 6px;
     z-index: 1000;
     pointer-events: none;
-    font-size: 14px; /* Maintain larger text */
+    font-size: 14px;
 }
 
 .insufficient-gold-tooltip {
     position: absolute;
     color: white;
     background-color: rgba(0, 0, 255, 0.7);
-    padding: 6px; /* Maintain padding for larger text */
+    padding: 6px;
     border-radius: 6px;
     z-index: 1000;
     pointer-events: none;
-    font-size: 14px; /* Maintain larger text */
+    font-size: 14px;
 }
 
-/* Game Over Popup */
 .game-over-popup {
     position: absolute;
     color: white;
     background-color: rgba(0, 0, 0, 0.8);
-    padding: 24px; /* Maintain padding for larger text */
+    padding: 24px;
     border-radius: 12px;
     text-align: center;
-    font-size: 28px; /* Maintain larger text */
+    font-size: 28px;
     z-index: 1001;
     pointer-events: auto;
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
@@ -574,10 +551,10 @@ body {
     background-color: #ff4136;
     color: white;
     border: none;
-    padding: 10px 18px; /* Maintain padding for larger text */
+    padding: 10px 18px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 18px; /* Maintain larger text */
+    font-size: 18px;
     transition: background-color 0.3s, transform 0.1s;
 }
 
@@ -586,7 +563,67 @@ body {
     transform: translateY(-1px);
 }
 
-/* Start Menu */
+.leaderboard-popup {
+    position: absolute;
+    color: white;
+    background-color: rgba(0, 100, 0, 0.9);
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+    z-index: 1001;
+    pointer-events: auto;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+    border: 1px solid #555;
+    width: 300px;
+    max-width: 90%;
+}
+
+.leaderboard-popup h2 {
+    font-size: 24px;
+    color: #ffd700;
+    margin-bottom: 12px;
+}
+
+.leaderboard-popup p {
+    font-size: 18px;
+    margin: 8px 0;
+}
+
+.leaderboard-popup h3 {
+    font-size: 20px;
+    color: #fff;
+    margin: 12px 0 8px;
+}
+
+.leaderboard-popup ol {
+    list-style-position: inside;
+    padding: 0;
+    margin: 0 0 12px 0;
+}
+
+.leaderboard-popup li {
+    font-size: 16px;
+    color: #ddd;
+    margin: 4px 0;
+}
+
+.leaderboard-popup button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.1s;
+    margin: 0 5px;
+}
+
+.leaderboard-popup button:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+}
+
 #startMenu {
     position: absolute;
     top: 50%;
@@ -595,22 +632,22 @@ body {
     text-align: center;
     background: rgba(0, 0, 0, 0.8);
     color: white;
-    padding: 24px; /* Maintain padding for larger text */
+    padding: 24px;
     border-radius: 12px;
     z-index: 1000;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
 #startMenu h2 {
-    margin-bottom: 16px; /* Maintain margin for larger text */
+    margin-bottom: 16px;
     color: #ffd700;
-    font-size: 24px; /* Maintain larger header text */
+    font-size: 24px;
 }
 
 #startMenu button {
-    margin: 0 12px; /* Maintain margin for larger text */
-    padding: 12px 24px; /* Maintain padding for larger text */
-    font-size: 18px; /* Maintain larger button text */
+    margin: 0 12px;
+    padding: 12px 24px;
+    font-size: 18px;
     cursor: pointer;
     background-color: #4CAF50;
     color: white;
@@ -623,7 +660,6 @@ body {
     background-color: #45a049;
 }
 
-/* Responsive Design for All Screen Sizes */
 @media (max-width: 1200px) {
     #gameContainer {
         flex-direction: column;
@@ -631,16 +667,16 @@ body {
 
     #leftPanel, #rightPanel {
         width: 100%;
-        max-height: 220px; /* Slightly increased for larger text */
+        max-height: 220px;
         min-width: 0;
-        padding: 8px; /* Reduced padding for smaller screens */
-        font-size: 14px; /* Reduced for tablets */
+        padding: 8px;
+        font-size: 14px;
     }
 
     #gameDisplay {
         width: 100%;
-        max-height: calc(100vh - 280px); /* Adjust for panels and HUD */
-        padding: 8px; /* Reduced padding on smaller screens */
+        max-height: calc(100vh - 280px);
+        padding: 8px;
         min-width: 0;
     }
 
@@ -648,7 +684,7 @@ body {
         width: 100%;
         aspect-ratio: 1 / 1;
         max-height: calc(100vh - 280px);
-        max-width: 100%; /* Scale down on smaller screens */
+        max-width: 100%;
         min-width: 0;
     }
 
@@ -659,57 +695,56 @@ body {
         width: 100%;
     }
 
-    .start-button, .pause-button, .reset-button, .dev-button, .spawn-button, .skip-button {
+    .start-button, .pause-button, .reset-button, .dev-button, .spawn-button, .skip-button, .settings-button {
         width: auto;
-        margin: 6px; /* Reduced margin for smaller screens */
-        font-size: 14px; /* Reduced for tablets */
+        margin: 6px;
+        font-size: 14px;
     }
 
     .hud {
-        font-size: 14px; /* Reduced for tablets */
-        padding: 10px 14px; /* Reduced padding for tablets */
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+
+    #gameInfo {
+        gap: 6px 10px;
     }
 
     .hud span {
-        font-size: 14px; /* Reduced for tablets */
-        padding: 3px 6px; /* Reduced padding for tablets */
+        font-size: 14px;
+        padding: 3px 6px;
     }
 
-    #towerStats, #enemyStats {
-        font-size: 14px; /* Reduced for all towers and enemies on tablets */
+    .leaderboard-popup {
+        width: 280px;
+        padding: 20px;
     }
 
-    #towerStats .tower-name, #enemyStats > div:first-child {
-        font-size: 20px; /* Reduced for all towers and enemies on tablets */
+    .leaderboard-popup h2 {
+        font-size: 22px;
     }
 
-    #towerStats > div, #enemyStats > div {
-        margin-bottom: 4px; /* Maintain minimal gap */
-        padding-left: 2px; /* Maintain minimal padding */
+    .leaderboard-popup p {
+        font-size: 16px;
     }
 
-    #towerStats span, #enemyStats span {
-        margin-left: 4px; /* Maintain minimal margin for bullet points */
+    .leaderboard-popup h3 {
+        font-size: 18px;
     }
 
-    #towerStats > div:contains("Elemental Interaction:"), #enemyStats > div:contains("Elemental Interaction:") {
-        margin-bottom: 0; /* Maintain no gap */
+    .leaderboard-popup li {
+        font-size: 14px;
     }
 
-    #towerStats > div:contains("Elemental Interaction:") span,
-    #enemyStats > div:contains("Elemental Interaction:") span {
-        margin-top: 0; /* Maintain no gap above bullet points */
-    }
-
-    #towerStats > div:contains("Elemental Interaction:") span:not(:last-child),
-    #enemyStats > div:contains("Elemental Interaction:") span:not(:last-child) {
-        margin-bottom: 0; /* Maintain no gap between bullet points */
+    .leaderboard-popup button {
+        padding: 8px 16px;
+        font-size: 14px;
     }
 }
 
 @media (max-width: 768px) {
     #gameCanvas {
-        max-height: calc(100vh - 330px); /* Further adjust for phones */
+        max-height: calc(100vh - 330px);
         min-width: 0;
     }
 
@@ -717,180 +752,175 @@ body {
         flex-wrap: wrap;
     }
 
-    .start-button, .pause-button, .reset-button, .dev-button, .spawn-button, .skip-button {
+    .start-button, .pause-button, .reset-button, .dev-button, .spawn-button, .skip-button, .settings-button {
         flex-basis: calc(50% - 10px);
-        font-size: 12px; /* Further reduced for phones */
+        font-size: 12px;
     }
 
     #leftPanel, #rightPanel {
-        padding: 6px; /* Further reduced padding on phones */
-        font-size: 12px; /* Further reduced for phones */
+        padding: 6px;
+        font-size: 12px;
     }
 
     #towerWindow, #enemyWindow {
-        padding: 8px; /* Reduced padding on phones */
+        padding: 8px;
     }
 
     .stats {
-        padding: 8px; /* Reduced padding on phones */
+        padding: 8px;
     }
 
     .hud {
-        padding: 8px 10px; /* Reduced padding on phones */
-        font-size: 12px; /* Further reduced for phones */
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    #gameInfo {
+        gap: 4px 8px;
     }
 
     .hud span {
-        font-size: 12px; /* Further reduced for phones */
-        padding: 2px 5px; /* Reduced padding for phones */
+        font-size: 12px;
+        padding: 2px 5px;
     }
 
-    #towerStats, #enemyStats {
-        font-size: 14px; /* Reduced for all towers and enemies on phones */
+    .leaderboard-popup {
+        width: 250px;
+        padding: 16px;
     }
 
-    #towerStats .tower-name, #enemyStats > div:first-child {
-        font-size: 20px; /* Reduced for all towers and enemies on phones */
+    .leaderboard-popup h2 {
+        font-size: 20px;
     }
 
-    #towerStats > div, #enemyStats > div {
-        margin-bottom: 4px; /* Maintain minimal gap */
-        padding-left: 2px; /* Maintain minimal padding */
+    .leaderboard-popup p {
+        font-size: 14px;
     }
 
-    #towerStats span, #enemyStats span {
-        margin-left: 4px; /* Maintain minimal margin for bullet points */
+    .leaderboard-popup h3 {
+        font-size: 16px;
     }
 
-    #towerStats > div:contains("Elemental Interaction:"), #enemyStats > div:contains("Elemental Interaction:") {
-        margin-bottom: 0; /* Maintain no gap */
+    .leaderboard-popup li {
+        font-size: 12px;
     }
 
-    #towerStats > div:contains("Elemental Interaction:") span,
-    #enemyStats > div:contains("Elemental Interaction:") span {
-        margin-top: 0; /* Maintain no gap above bullet points */
-    }
-
-    #towerStats > div:contains("Elemental Interaction:") span:not(:last-child),
-    #enemyStats > div:contains("Elemental Interaction:") span:not(:last-child) {
-        margin-bottom: 0; /* Maintain no gap between bullet points */
+    .leaderboard-popup button {
+        padding: 6px 12px;
+        font-size: 12px;
     }
 }
 
 @media (min-width: 1920px) {
-    /* For ultrawide screens, ensure balanced expansion */
     #leftPanel {
-        width: 320px; /* Maintain increased width on ultrawide */
+        width: 320px;
         min-width: 250px;
-        padding: 14px; /* Maintain padding for larger text on ultrawide */
-        font-size: 16px; /* Maintain larger text on ultrawide */
+        padding: 14px;
+        font-size: 16px;
     }
 
     #rightPanel {
-        width: 280px; /* Maintain reduced width on ultrawide */
+        width: 280px;
         min-width: 250px;
-        padding: 14px; /* Maintain padding for larger text on ultrawide */
-        font-size: 16px; /* Maintain larger text on ultrawide */
+        padding: 14px;
+        font-size: 16px;
     }
 
     #gameCanvas {
-        max-width: 1000px; /* Maintain 1000px grid for ultrawide */
+        max-width: 1000px;
         max-height: 1000px;
     }
 
     .hud {
-        font-size: 18px; /* Maintain slightly larger on ultrawide */
-        padding: 14px 20px; /* Maintain padding on ultrawide */
+        font-size: 18px;
+        padding: 14px 20px;
+    }
+
+    #gameInfo {
+        gap: 10px 14px;
     }
 
     .hud span {
-        font-size: 18px; /* Maintain slightly larger on ultrawide */
-        padding: 5px 10px; /* Maintain padding on ultrawide */
+        font-size: 18px;
+        padding: 5px 10px;
     }
 
-    #towerStats, #enemyStats {
-        font-size: 14px; /* Reduced for all towers and enemies on ultrawide */
+    .leaderboard-popup {
+        width: 350px;
+        padding: 28px;
     }
 
-    #towerStats .tower-name, #enemyStats > div:first-child {
-        font-size: 20px; /* Reduced for all towers and enemies on ultrawide */
+    .leaderboard-popup h2 {
+        font-size: 26px;
     }
 
-    #towerStats > div, #enemyStats > div {
-        margin-bottom: 4px; /* Maintain minimal gap */
-        padding-left: 2px; /* Maintain minimal padding */
+    .leaderboard-popup p {
+        font-size: 20px;
     }
 
-    #towerStats span, #enemyStats span {
-        margin-left: 4px; /* Maintain minimal margin for bullet points */
+    .leaderboard-popup h3 {
+        font-size: 22px;
     }
 
-    #towerStats > div:contains("Elemental Interaction:"), #enemyStats > div:contains("Elemental Interaction:") {
-        margin-bottom: 0; /* Maintain no gap */
+    .leaderboard-popup li {
+        font-size: 18px;
     }
 
-    #towerStats > div:contains("Elemental Interaction:") span,
-    #enemyStats > div:contains("Elemental Interaction:") span {
-        margin-top: 0; /* Maintain no gap above bullet points */
-    }
-
-    #towerStats > div:contains("Elemental Interaction:") span:not(:last-child),
-    #enemyStats > div:contains("Elemental Interaction:") span:not(:last-child) {
-        margin-bottom: 0; /* Maintain no gap between bullet points */
+    .leaderboard-popup button {
+        padding: 12px 20px;
+        font-size: 18px;
     }
 }
 
 @media (max-width: 480px) {
-    /* For very small phones, ensure minimal layout */
     #gameCanvas {
-        max-height: calc(100vh - 350px); /* Maximize grid on tiny screens */
+        max-height: calc(100vh - 350px);
         min-width: 0;
     }
 
     #leftPanel, #rightPanel {
-        max-height: 180px; /* Smaller panel height for phones */
-        padding: 6px; /* Maintain minimal padding */
-        font-size: 12px; /* Maintain smallest readable size */
+        max-height: 180px;
+        padding: 6px;
+        font-size: 12px;
     }
 
     .hud {
-        font-size: 12px; /* Maintain smallest readable size */
-        padding: 6px 8px; /* Further reduced padding on tiny screens */
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    #gameInfo {
+        gap: 4px 6px;
     }
 
     .hud span {
-        font-size: 12px; /* Maintain smallest readable size */
-        padding: 2px 4px; /* Further reduced padding on tiny screens */
+        font-size: 12px;
+        padding: 2px 4px;
     }
 
-    #towerStats, #enemyStats {
-        font-size: 14px; /* Reduced for all towers and enemies on tiny screens */
+    .leaderboard-popup {
+        width: 220px;
+        padding: 12px;
     }
 
-    #towerStats .tower-name, #enemyStats > div:first-child {
-        font-size: 20px; /* Reduced for all towers and enemies on tiny screens */
+    .leaderboard-popup h2 {
+        font-size: 18px;
     }
 
-    #towerStats > div, #enemyStats > div {
-        margin-bottom: 4px; /* Maintain minimal gap */
-        padding-left: 2px; /* Maintain minimal padding */
+    .leaderboard-popup p {
+        font-size: 12px;
     }
 
-    #towerStats span, #enemyStats span {
-        margin-left: 4px; /* Maintain minimal margin for bullet points */
+    .leaderboard-popup h3 {
+        font-size: 14px;
     }
 
-    #towerStats > div:contains("Elemental Interaction:"), #enemyStats > div:contains("Elemental Interaction:") {
-        margin-bottom: 0; /* Maintain no gap */
+    .leaderboard-popup li {
+        font-size: 10px;
     }
 
-    #towerStats > div:contains("Elemental Interaction:") span,
-    #enemyStats > div:contains("Elemental Interaction:") span {
-        margin-top: 0; /* Maintain no gap above bullet points */
-    }
-
-    #towerStats > div:contains("Elemental Interaction:") span:not(:last-child),
-    #enemyStats > div:contains("Elemental Interaction:") span:not(:last-child) {
-        margin-bottom: 0; /* Maintain no gap between bullet points */
+    .leaderboard-popup button {
+        padding: 5px 10px;
+        font-size: 10px;
     }
 }
