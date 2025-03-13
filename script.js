@@ -156,9 +156,9 @@ const towers = [
     maxHP: 40,
     upgradeLevel: 0,
     upgrades: [
-        { fireRate: 0.7, damage: 1, range: 2, slowMultiplier: 0.4 }, // 60% slow
-        { fireRate: 1.2, damage: 1, range: 2, slowMultiplier: 0.3 }, // 70% slow
-        { fireRate: 1.5, damage: 1, range: 2, slowMultiplier: 0.2 }  // 80% slow
+        { fireRate: 0.7, damage: 1, range: 2, slowMultiplier: 0.5 }, // 50% slow
+        { fireRate: 1.2, damage: 1, range: 2, slowMultiplier: 0.4 }, // 60% slow
+        { fireRate: 1.5, damage: 1, range: 2, slowMultiplier: 0.3 }  // 70% slow
     ]
 },
     { 
@@ -380,12 +380,12 @@ const wavePatterns = [
     { name: "Regular Hard", desc: "75 waves of tougher enemies, a long challenge.", file: "hard" },
     { name: "Boss Mode", desc: "Fewer waves, but packed with high-HP bosses.", file: "boss_mode" },
     { name: "Buggy Infestation", desc: "Increased Buggy spawns and holes!", file: "buggy_infest" },
-    { name: "Coming Soon 1", desc: "Stay tuned for more!", file: "coming_soon_1" },
-    { name: "Coming Soon 2", desc: "Stay tuned for more!", file: "coming_soon_2" },
-    { name: "Coming Soon 3", desc: "Stay tuned for more!", file: "coming_soon_3" },
-    { name: "Coming Soon 4", desc: "Stay tuned for more!", file: "coming_soon_4" },
-    { name: "Coming Soon 5", desc: "Stay tuned for more!", file: "coming_soon_5" },
-    { name: "Coming Soon 6", desc: "Stay tuned for more!", file: "coming_soon_6" }
+    { name: "The Struggle", desc: "Tough  limited counts with high hp", file: "struggle" },
+    { name: "Extreme Infestation", desc: "Damn Bugs Everywhere!!", file: "extreme_infest" },
+    { name: "Consistent Nightmare", desc: "Consistent waves", file: "consistent" },
+    { name: "Speedy", desc: "Too Fast for comfort", file: "speedy" },
+    { name: "Marathon", desc: "100 waves", file: "marathon" },
+    { name: "Coming Soon 1", desc: "Stay tuned for more!", file: "coming_soon_1" }
 ];
 
 
@@ -398,8 +398,8 @@ const stepTime = 1 / 60; // Assuming 60 fps for smooth animation
 // Start of challenge constants
 const challengeFiles = [
     'easy', 'hard', 'boss_mode', 'buggy_infest',
-    'coming_soon_1', 'coming_soon_2', 'coming_soon_3',
-    'coming_soon_4', 'coming_soon_5', 'coming_soon_6'
+    'struggle', 'extreme_infest', 'consistent',
+    'speedy', 'marathon', 'coming_soon_1'
 ];
 // End of challenge constants
 
@@ -471,43 +471,32 @@ let waveActive = false; // Global state for wave activity
 let waves = [];
 
 async function loadWaves(difficulty) {
+    console.log("Loading difficulty:", difficulty);
     const maxRetries = 3;
     let attempts = 0;
-
     while (attempts < maxRetries) {
         try {
-            const response = await fetch(`waves_${difficulty}.json`, { cache: 'no-store' });
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            waves = await response.json();
-            // console.log(`Waves loaded successfully for ${difficulty} difficulty.`);
-            return; // Exit on success
+            console.log(`Fetching ./waves_${difficulty}.json, attempt ${attempts + 1}`);
+            const response = await fetch(`./waves_${difficulty}.json`, { cache: 'no-store' });
+            console.log(`Response status: ${response.status}`);
+            const text = await response.text();
+            console.log("Raw response:", text.slice(0, 50));
+            waves = JSON.parse(text);
+            console.log("Waves loaded:", waves[0]);
+            return;
         } catch (error) {
             attempts++;
-            // console.error(`Attempt ${attempts} failed to load wave data:`, error);
+            console.error(`Fetch failed: ${error.message}`);
             if (attempts === maxRetries) {
-                console.log("Max retries reached. Using fallback wave data.");
-                waves = [
-                    {
-                        enemies: [
-                            { type: 0, count: 5 }, // Pinky
-                            { type: 1, count: 3 }  // Greeny
-                        ],
-                        hpMultiplier: 1,
-                        speedMultiplier: 1,
-                        wave_delay: 10000,
-                        hole: {
-                            spawn: false
-                        }
-                    }
-                ];
+                console.warn("Using fallback waves");
+                waves = [/* your fallback */];
             } else {
-                await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms before retry
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
         }
     }
 }
+
 // End of wave system update
 
 
@@ -1253,7 +1242,7 @@ class Rocket {
 
             enemy.hp -= individualDamage;
             this.damageDealt += individualDamage;
-            console.log(`Rocket #${this.rocketId} hit ${enemy.name} at (${enemy.x.toFixed(2)}, ${enemy.y.toFixed(2)}) - Damage: ${individualDamage.toFixed(2)}, Old HP: ${oldHP.toFixed(2)}, New HP: ${enemy.hp.toFixed(2)}, Multiplier: ${damageMultiplier}x`);
+            // console.log(`Rocket #${this.rocketId} hit ${enemy.name} at (${enemy.x.toFixed(2)}, ${enemy.y.toFixed(2)}) - Damage: ${individualDamage.toFixed(2)}, Old HP: ${oldHP.toFixed(2)}, New HP: ${enemy.hp.toFixed(2)}, Multiplier: ${damageMultiplier}x`);
 
             if (enemy.hp <= 0) {
                 killEnemy(enemy, enemiesOnField);
@@ -1264,7 +1253,7 @@ class Rocket {
             // console.log(`Rocket #${this.rocketId} Explosion Total Damage: ${this.damageDealt.toFixed(2)} to ${enemiesHit.length} enemies`);
         }
         this.tower.damageDealt = (this.tower.damageDealt || 0) + this.damageDealt;
-        console.log(`Total Rocket Damage for Tower at (${this.tower.x}, ${this.tower.y}) - Level ${this.tower.upgradeLevel}: ${this.tower.damageDealt.toFixed(2)}`);
+        // console.log(`Total Rocket Damage for Tower at (${this.tower.x}, ${this.tower.y}) - Level ${this.tower.upgradeLevel}: ${this.tower.damageDealt.toFixed(2)}`);
     }
 
     draw() {
@@ -1362,7 +1351,7 @@ class LightBullet {
             if (distance < (wraith.bodySize || 20) + this.radius) {
                 const oldHP = wraith.hp;
                 wraith.hp -= this.damage;
-                console.log(`Wraith ${wraith.name} HP reduced from ${oldHP} to ${wraith.hp}, Damage: ${oldHP - wraith.hp}`);
+                // console.log(`Wraith ${wraith.name} HP reduced from ${oldHP} to ${wraith.hp}, Damage: ${oldHP - wraith.hp}`);
                 if (typeof this.tower.damageDealt !== 'number') {
                     this.tower.damageDealt = 0;
                 }
@@ -1727,7 +1716,7 @@ function updateTowers(deltaTime) {
                                 const actualDamageAoE = tower.damage * damageMultiplier;
                                 const oldHPFlame = enemy.hp;
                                 enemy.hp -= actualDamageAoE;
-                                console.log(`${tower.name} hit ${enemy.name} - HP reduced from ${oldHPFlame} to ${enemy.hp}, Damage: ${actualDamageAoE}`);
+                                // console.log(`${tower.name} hit ${enemy.name} - HP reduced from ${oldHPFlame} to ${enemy.hp}, Damage: ${actualDamageAoE}`);
                                 tower.damageDealt += actualDamageAoE;
                                 if (enemy.hp <= 0) {
                                     killEnemy(enemy, enemiesOnField);
@@ -1741,7 +1730,7 @@ function updateTowers(deltaTime) {
                                 const actualDamageAoE = tower.damage * damageMultiplier;
                                 const oldHPFreeze = enemy.hp;
                                 enemy.hp -= actualDamageAoE;
-                                console.log(`${tower.name} applied freeze effect to ${enemy.name} - HP reduced from ${oldHPFreeze} to ${enemy.hp}, Damage: ${actualDamageAoE}, Slowed to ${(1 - tower.upgrades[tower.upgradeLevel].slowMultiplier) * 100}%`);
+                                // console.log(`${tower.name} applied freeze effect to ${enemy.name} - HP reduced from ${oldHPFreeze} to ${enemy.hp}, Damage: ${actualDamageAoE}, Slowed to ${(1 - tower.upgrades[tower.upgradeLevel].slowMultiplier) * 100}%`);
                                 tower.damageDealt += actualDamageAoE;
                                 if (enemy.hp <= 0) {
                                     killEnemy(enemy, enemiesOnField);
@@ -1751,7 +1740,7 @@ function updateTowers(deltaTime) {
                         case "Aqua":
                             const oldHPAqua = nearestEnemy.hp;
                             nearestEnemy.hp -= actualDamage;
-                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPAqua} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
+                            // console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPAqua} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
                             tower.damageDealt += actualDamage;
                             createAquaStreamEffect(tower, nearestEnemy);
                             if (nearestEnemy.hp <= 0) {
@@ -1762,7 +1751,7 @@ function updateTowers(deltaTime) {
                             nearestEnemy.speedMultiplier = 0.8;
                             const oldHPGale = nearestEnemy.hp;
                             nearestEnemy.hp -= actualDamage;
-                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPGale} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
+                            // console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPGale} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
                             tower.damageDealt += actualDamage;
                             createWindBladeEffect(tower, nearestEnemy);
                             if (nearestEnemy.hp <= 0) {
@@ -1777,7 +1766,7 @@ function updateTowers(deltaTime) {
                                 const oldHPTerra = enemy.hp;
                                 enemy.hp -= actualDamageAoE;
                                 enemy.speedMultiplier = Math.max(0.5, enemy.speedMultiplier - 0.05); // Integrate Earthquake slow
-                                console.log(`${tower.name} hit ${enemy.name} - HP reduced from ${oldHPTerra} to ${enemy.hp}, Damage: ${actualDamageAoE}, Stunned and slowed`);
+                                // console.log(`${tower.name} hit ${enemy.name} - HP reduced from ${oldHPTerra} to ${enemy.hp}, Damage: ${actualDamageAoE}, Stunned and slowed`);
                                 tower.damageDealt += actualDamageAoE;
                                 if (enemy.hp <= 0) {
                                     killEnemy(enemy, enemiesOnField);
@@ -1788,7 +1777,7 @@ function updateTowers(deltaTime) {
                         case "Thunder":
                             const oldHPThunder = nearestEnemy.hp;
                             nearestEnemy.hp -= actualDamage;
-                            console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPThunder} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
+                            // console.log(`${tower.name} hit ${nearestEnemy.name} - HP reduced from ${oldHPThunder} to ${nearestEnemy.hp}, Damage: ${actualDamage}`);
                             tower.damageDealt += actualDamage;
                             createLightningEffect(tower, nearestEnemy);
                             if (nearestEnemy.hp <= 0) {
@@ -1814,9 +1803,9 @@ function updateTowers(deltaTime) {
                             if (tower.name === "Pellet" || tower.name === "Gatling" || tower.name === "Sniper") {
                                 createBullet(tower, nearestEnemy);
                             } else if (tower.name === "Rocket") {
-                                console.log(`Attempting to fire Rocket at (${tower.x}, ${tower.y}) - Cooldown: ${timeSinceLastFire.toFixed(2)}s of ${1 / tower.fireRate}s`);
+                                // console.log(`Attempting to fire Rocket at (${tower.x}, ${tower.y}) - Cooldown: ${timeSinceLastFire.toFixed(2)}s of ${1 / tower.fireRate}s`);
                                 createRocket(tower, nearestEnemy);
-                                console.log(`Rocket fired from (${tower.x}, ${tower.y}) - Instance Count: ${towersOnGrid.filter(t => t.name === "Rocket").length}`);
+                                // console.log(`Rocket fired from (${tower.x}, ${tower.y}) - Instance Count: ${towersOnGrid.filter(t => t.name === "Rocket").length}`);
                             }
                     }
                 }
@@ -2013,7 +2002,7 @@ function calculateElementDamage(towerElement, enemyElement) {
         (towerElement === 'Light' && enemyElement === 'Ghost') ||
         (towerElement === 'Chemical' && enemyElement === 'Bug')
     ) {
-        return 4; // Quadruple damage for strong against matchups
+        return 6; // Quadruple damage for strong against matchups
     }
     
     // Special case for Ghost and Bug
@@ -3438,7 +3427,7 @@ class Hole {
         if (this.buggiesSpawned && this.buggiesFromHole.length === 0) {
             if (!this.fadeStartTime) {
                 this.fadeStartTime = currentTime;
-                console.log(`Hole ${this.id} at (${this.x}, ${this.y}) starting fade-out at ${new Date().toISOString()} - No Buggies left`);
+                // console.log(`Hole ${this.id} at (${this.x}, ${this.y}) starting fade-out at ${new Date().toISOString()} - No Buggies left`);
             }
             this.fadeOut(currentTime);
         }
@@ -3449,7 +3438,7 @@ class Hole {
             let index = holes.indexOf(this);
             if (index !== -1) {
                 holes.splice(index, 1);
-                console.log(`Hole ${this.id} at (${this.x}, ${this.y}) faded away at ${new Date().toISOString()}`);
+                // console.log(`Hole ${this.id} at (${this.x}, ${this.y}) faded away at ${new Date().toISOString()}`);
             }
         }
     }
@@ -3479,9 +3468,9 @@ class Hole {
                 newBuggy.y = Math.max(0.5, Math.min(gridHeight - 0.5, newBuggy.y));
                 enemiesOnField.push(newBuggy);
                 this.buggiesFromHole.push(newBuggy);
-                console.log(`Buggy spawned from hole ${this.id} at (${newBuggy.x}, ${newBuggy.y}) at ${new Date().toISOString()} - HP: ${newBuggy.hp}, Speed: ${newBuggy.speed}`);
+                // console.log(`Buggy spawned from hole ${this.id} at (${newBuggy.x}, ${newBuggy.y}) at ${new Date().toISOString()} - HP: ${newBuggy.hp}, Speed: ${newBuggy.speed}`);
             } else {
-                console.error(`Failed to create buggy for hole ${this.id} at (${this.x}, ${this.y}) at ${new Date().toISOString()}`);
+                // console.error(`Failed to create buggy for hole ${this.id} at (${this.x}, ${this.y}) at ${new Date().toISOString()}`);
             }
         }
         this.buggiesSpawned = true;
@@ -3501,7 +3490,7 @@ class Hole {
         if (currentTime - this.startTime >= totalTime * 1000) {
             if (!this.fadeStartTime) {
                 this.fadeStartTime = currentTime;
-                console.log(`Auto fade-out initiated for hole ${this.id} at (${this.x}, ${this.y}) at ${new Date().toISOString()}`);
+                // console.log(`Auto fade-out initiated for hole ${this.id} at (${this.x}, ${this.y}) at ${new Date().toISOString()}`);
             }
             this.fadeOut(currentTime);
         }
@@ -3539,7 +3528,7 @@ function removeBuggyFromHole(enemy) {
             let index = hole.buggiesFromHole.indexOf(enemy);
             if (index !== -1) {
                 hole.buggiesFromHole.splice(index, 1);
-                console.log(`Buggy removed from hole ${hole.id} at (${hole.x}, ${hole.y}) at ${new Date().toISOString()} - Remaining: ${hole.buggiesFromHole.length}`);
+                // console.log(`Buggy removed from hole ${hole.id} at (${hole.x}, ${hole.y}) at ${new Date().toISOString()} - Remaining: ${hole.buggiesFromHole.length}`);
             }
         });
     }

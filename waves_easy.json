@@ -4,7 +4,7 @@
     "enemies": [
       {
         "type": 0,
-        "count": 4
+        "count": 6
       }
     ],
     "hpMultiplier": 0.3,
@@ -16,7 +16,7 @@
     "enemies": [
       {
         "type": 0,
-        "count": 6
+        "count": 8
       }
     ],
     "hpMultiplier": 0.4,
@@ -28,7 +28,7 @@
     "enemies": [
       {
         "type": 0,
-        "count": 8
+        "count": 10
       }
     ],
     "hpMultiplier": 0.5,
@@ -40,7 +40,7 @@
     "enemies": [
       {
         "type": 0,
-        "count": 10
+        "count": 12
       }
     ],
     "hpMultiplier": 0.6,
@@ -64,7 +64,7 @@
     "enemies": [
       {
         "type": 1,
-        "count": 4
+        "count": 6
       }
     ],
     "hpMultiplier": 0.8,
@@ -76,7 +76,7 @@
     "enemies": [
       {
         "type": 1,
-        "count": 6
+        "count": 8
       }
     ],
     "hpMultiplier": 0.9,
@@ -100,7 +100,7 @@
     "enemies": [
       {
         "type": 2,
-        "count": 4
+        "count": 6
       }
     ],
     "hpMultiplier": 1,
@@ -112,7 +112,7 @@
     "enemies": [
       {
         "type": 2,
-        "count": 6
+        "count": 8
       }
     ],
     "hpMultiplier": 1,
@@ -136,7 +136,7 @@
     "enemies": [
       {
         "type": 3,
-        "count": 4
+        "count": 6
       }
     ],
     "hpMultiplier": 1,
@@ -148,10 +148,10 @@
     "enemies": [
       {
         "type": 3,
-        "count": 6
+        "count": 8
       }
     ],
-    "hpMultiplier": 1,
+    "hpMultiplier": 1.1,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -163,7 +163,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1,
+    "hpMultiplier": 1.2,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -175,7 +175,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.5,
+    "hpMultiplier": 1.6,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -187,7 +187,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.5,
+    "hpMultiplier": 1.6,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -199,7 +199,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.5,
+    "hpMultiplier": 1.7,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -211,7 +211,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.5,
+    "hpMultiplier": 1.7,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -223,7 +223,7 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.6,
+    "hpMultiplier": 1.8,
     "speedMultiplier": 1,
     "wave_delay": 15000
   },
@@ -235,8 +235,8 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.6,
-    "speedMultiplier": 1,
+    "hpMultiplier": 1.8,
+    "speedMultiplier": 1.1,
     "wave_delay": 15000
   },
   {
@@ -247,8 +247,8 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.6,
-    "speedMultiplier": 1,
+    "hpMultiplier": 1.9,
+    "speedMultiplier": 1.1,
     "wave_delay": 15000
   },
   {
@@ -259,8 +259,8 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.6,
-    "speedMultiplier": 1,
+    "hpMultiplier": 2,
+    "speedMultiplier": 1.1,
     "wave_delay": 15000
   },
   {
@@ -271,8 +271,8 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.6,
-    "speedMultiplier": 1,
+    "hpMultiplier": 2.1,
+    "speedMultiplier": 1.1,
     "wave_delay": 15000
   },
   {
@@ -283,8 +283,8 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.6,
-    "speedMultiplier": 1,
+    "hpMultiplier": 2.3,
+    "speedMultiplier": 1.1,
     "wave_delay": 15000
   },
   {
@@ -296,7 +296,7 @@
       }
     ],
     "hpMultiplier": 1,
-    "speedMultiplier": 1,
+    "speedMultiplier": 1.1,
     "wave_delay": 15000
   },
   {
@@ -311,8 +311,8 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.8,
-    "speedMultiplier": 1,
+    "hpMultiplier": 2.3,
+    "speedMultiplier": 1.2,
     "wave_delay": 15000
   },
   {
@@ -327,8 +327,8 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.8,
-    "speedMultiplier": 1,
+    "hpMultiplier": 2.4,
+    "speedMultiplier": 1.2,
     "wave_delay": 15000
   },
   {
@@ -343,8 +343,8 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 1.8,
-    "speedMultiplier": 1,
+    "hpMultiplier": 2.5,
+    "speedMultiplier": 1.2,
     "wave_delay": 15000
   },
   {
@@ -359,8 +359,8 @@
         "count": 10
       }
     ],
-    "hpMultiplier": 2.5,
-    "speedMultiplier": 1,
+    "hpMultiplier": 2.7,
+    "speedMultiplier": 1.2,
     "wave_delay": 15000
   },
   {
@@ -380,7 +380,7 @@
       }
     ],
     "hpMultiplier": 2.9,
-    "speedMultiplier": 1,
+    "speedMultiplier": 1.2,
     "wave_delay": 15000
-   }
+  }
 ]
