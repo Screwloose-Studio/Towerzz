@@ -385,7 +385,7 @@ const wavePatterns = [
     { name: "Consistent Nightmare", desc: "Consistent waves", file: "consistent" },
     { name: "Speedy", desc: "Too Fast for comfort", file: "speedy" },
     { name: "Marathon", desc: "100 waves", file: "marathon" },
-    { name: "Coming Soon 1", desc: "Stay tuned for more!", file: "coming_soon_1" }
+    { name: "Improbable", desc: "improbable - take a vacation", file: "improbable" }
 ];
 
 
@@ -399,7 +399,7 @@ const stepTime = 1 / 60; // Assuming 60 fps for smooth animation
 const challengeFiles = [
     'easy', 'hard', 'boss_mode', 'buggy_infest',
     'struggle', 'extreme_infest', 'consistent',
-    'speedy', 'marathon', 'coming_soon_1'
+    'speedy', 'marathon', 'improbable'
 ];
 // End of challenge constants
 
